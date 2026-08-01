@@ -1,0 +1,10 @@
+[
+  { "id": "mining", "name": "Mining", "description": "Skill for extracting ores and minerals." },
+  { "id": "woodcutting", "name": "Woodcutting", "description": "Skill for chopping trees and gathering wood." },
+  { "id": "fishing", "name": "Fishing", "description": "Skill for catching fish in bodies of water." },
+  { "id": "hunting", "name": "Hunting", "description": "Skill for tracking and hunting animals." },
+  { "id": "smithing", "name": "Smithing", "description": "Skill for smelting ores and forging equipment." },
+  { "id": "crafting", "name": "Crafting", "description": "Skill for assembling items and goods." },
+  { "id": "cooking", "name": "Cooking", "description": "Skill for preparing food and meals." },
+  { "id": "combat", "name": "Combat", "description": "Skill for fighting enemies and bosses." }
+]

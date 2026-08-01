@@ -1,0 +1,29 @@
+[
+  { "id": "smelt_copper_bar", "name": "Smelt Copper Bar", "skillId": "smithing", "levelReq": 1, "xpPerCraft": 12, "resultItemId": "copper_bar", "resultAmount": 1, "ingredients": [{ "itemId": "copper_ore", "amount": 2 }] },
+  { "id": "smelt_iron_bar", "name": "Smelt Iron Bar", "skillId": "smithing", "levelReq": 1, "xpPerCraft": 25, "resultItemId": "iron_bar", "resultAmount": 1, "ingredients": [{ "itemId": "iron_ore", "amount": 2 }] },
+  { "id": "smelt_silver_bar", "name": "Smelt Silver Bar", "skillId": "smithing", "levelReq": 3, "xpPerCraft": 40, "resultItemId": "silver_bar", "resultAmount": 1, "ingredients": [{ "itemId": "silver_ore", "amount": 2 }] },
+  { "id": "smelt_gold_bar", "name": "Smelt Gold Bar", "skillId": "smithing", "levelReq": 5, "xpPerCraft": 60, "resultItemId": "gold_bar", "resultAmount": 1, "ingredients": [{ "itemId": "gold_ore", "amount": 2 }] },
+  { "id": "smelt_mithril_bar", "name": "Smelt Mithril Bar", "skillId": "smithing", "levelReq": 8, "xpPerCraft": 100, "resultItemId": "mithril_bar", "resultAmount": 1, "ingredients": [{ "itemId": "mithril_ore", "amount": 3 }] },
+
+  { "id": "craft_bronze_sword", "name": "Craft Bronze Sword", "skillId": "smithing", "levelReq": 1, "xpPerCraft": 25, "resultItemId": "bronze_sword", "resultAmount": 1, "ingredients": [{ "itemId": "copper_bar", "amount": 1 }, { "itemId": "wood_log", "amount": 1 }] },
+  { "id": "craft_iron_sword", "name": "Craft Iron Sword", "skillId": "smithing", "levelReq": 1, "xpPerCraft": 50, "resultItemId": "iron_sword", "resultAmount": 1, "ingredients": [{ "itemId": "iron_bar", "amount": 2 }, { "itemId": "wood_log", "amount": 1 }] },
+  { "id": "craft_steel_sword", "name": "Craft Steel Sword", "skillId": "smithing", "levelReq": 3, "xpPerCraft": 100, "resultItemId": "steel_sword", "resultAmount": 1, "ingredients": [{ "itemId": "iron_bar", "amount": 3 }, { "itemId": "birch_log", "amount": 1 }] },
+  { "id": "craft_mithril_sword", "name": "Craft Mithril Sword", "skillId": "smithing", "levelReq": 8, "xpPerCraft": 250, "resultItemId": "mithril_sword", "resultAmount": 1, "ingredients": [{ "itemId": "mithril_bar", "amount": 4 }, { "itemId": "willow_log", "amount": 1 }] },
+
+  { "id": "craft_iron_pickaxe", "name": "Craft Iron Pickaxe", "skillId": "crafting", "levelReq": 1, "xpPerCraft": 40, "resultItemId": "iron_pickaxe", "resultAmount": 1, "ingredients": [{ "itemId": "iron_bar", "amount": 2 }, { "itemId": "wood_log", "amount": 1 }] },
+  { "id": "craft_steel_pickaxe", "name": "Craft Steel Pickaxe", "skillId": "crafting", "levelReq": 4, "xpPerCraft": 90, "resultItemId": "steel_pickaxe", "resultAmount": 1, "ingredients": [{ "itemId": "iron_bar", "amount": 3 }, { "itemId": "birch_log", "amount": 1 }] },
+  { "id": "craft_iron_hatchet", "name": "Craft Iron Hatchet", "skillId": "crafting", "levelReq": 1, "xpPerCraft": 40, "resultItemId": "iron_hatchet", "resultAmount": 1, "ingredients": [{ "itemId": "iron_bar", "amount": 2 }, { "itemId": "wood_log", "amount": 1 }] },
+  { "id": "craft_steel_hatchet", "name": "Craft Steel Hatchet", "skillId": "crafting", "levelReq": 4, "xpPerCraft": 90, "resultItemId": "steel_hatchet", "resultAmount": 1, "ingredients": [{ "itemId": "iron_bar", "amount": 3 }, { "itemId": "birch_log", "amount": 1 }] },
+
+  { "id": "craft_bronze_helmet", "name": "Craft Bronze Helmet", "skillId": "smithing", "levelReq": 1, "xpPerCraft": 20, "resultItemId": "bronze_helmet", "resultAmount": 1, "ingredients": [{ "itemId": "copper_bar", "amount": 2 }] },
+  { "id": "craft_iron_helmet", "name": "Craft Iron Helmet", "skillId": "smithing", "levelReq": 1, "xpPerCraft": 45, "resultItemId": "iron_helmet", "resultAmount": 1, "ingredients": [{ "itemId": "iron_bar", "amount": 3 }] },
+  { "id": "craft_steel_helmet", "name": "Craft Steel Helmet", "skillId": "smithing", "levelReq": 3, "xpPerCraft": 95, "resultItemId": "steel_helmet", "resultAmount": 1, "ingredients": [{ "itemId": "iron_bar", "amount": 4 }] },
+
+  { "id": "craft_bronze_chest", "name": "Craft Bronze Chestplate", "skillId": "smithing", "levelReq": 1, "xpPerCraft": 35, "resultItemId": "bronze_chest", "resultAmount": 1, "ingredients": [{ "itemId": "copper_bar", "amount": 4 }] },
+  { "id": "craft_iron_chest", "name": "Craft Iron Chestplate", "skillId": "smithing", "levelReq": 1, "xpPerCraft": 70, "resultItemId": "iron_chest", "resultAmount": 1, "ingredients": [{ "itemId": "iron_bar", "amount": 5 }] },
+  { "id": "craft_steel_chest", "name": "Craft Steel Chestplate", "skillId": "smithing", "levelReq": 3, "xpPerCraft": 140, "resultItemId": "steel_chest", "resultAmount": 1, "ingredients": [{ "itemId": "iron_bar", "amount": 6 }] },
+
+  { "id": "cook_shrimp", "name": "Cook Shrimp", "skillId": "cooking", "levelReq": 1, "xpPerCraft": 10, "resultItemId": "cooked_shrimp", "resultAmount": 1, "ingredients": [{ "itemId": "raw_shrimp", "amount": 1 }] },
+  { "id": "cook_trout", "name": "Cook Trout", "skillId": "cooking", "levelReq": 3, "xpPerCraft": 25, "resultItemId": "cooked_trout", "resultAmount": 1, "ingredients": [{ "itemId": "raw_trout", "amount": 1 }] },
+  { "id": "cook_beef", "name": "Cook Beef", "skillId": "cooking", "levelReq": 1, "xpPerCraft": 15, "resultItemId": "cooked_beef", "resultAmount": 1, "ingredients": [{ "itemId": "raw_beef", "amount": 1 }] }
+]

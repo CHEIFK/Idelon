@@ -1,0 +1,36 @@
+[
+  { "id": "copper_node", "name": "Copper Vein", "resourceItemId": "copper_ore", "miningLevel": 1, "respawnMs": 3000 },
+  { "id": "coal_node", "name": "Coal Seam", "resourceItemId": "coal", "miningLevel": 1, "respawnMs": 3000 },
+  { "id": "lead_node", "name": "Lead Quarry", "resourceItemId": "lead_ore", "miningLevel": 2, "respawnMs": 3500 },
+  { "id": "sand_node", "name": "Quartz Sand Dune", "resourceItemId": "sand", "miningLevel": 3, "respawnMs": 4000 },
+  { "id": "titanium_node", "name": "Titanium Cavern Seam", "resourceItemId": "titanium_ore", "miningLevel": 5, "respawnMs": 5000 },
+  { "id": "beryllium_node", "name": "Beryllium Cave Vein", "resourceItemId": "beryllium_ore", "miningLevel": 7, "respawnMs": 7000 },
+  { "id": "thorium_node", "name": "Thorium Depths Deposit", "resourceItemId": "thorium_ore", "miningLevel": 8, "respawnMs": 8500 },
+  { "id": "tungsten_node", "name": "Tungsten Core Monolith", "resourceItemId": "tungsten_ore", "miningLevel": 9, "respawnMs": 10000 },
+  { "id": "iron_node", "name": "Iron Seam", "resourceItemId": "iron_ore", "miningLevel": 1, "respawnMs": 5000 },
+  { "id": "silver_node", "name": "Silver Lode", "resourceItemId": "silver_ore", "miningLevel": 3, "respawnMs": 6000 },
+  { "id": "gold_node", "name": "Gold Outcrop", "resourceItemId": "gold_ore", "miningLevel": 5, "respawnMs": 8000 },
+  { "id": "mithril_node", "name": "Mithril Spire", "resourceItemId": "mithril_ore", "miningLevel": 8, "respawnMs": 12000 },
+  { "id": "adamant_node", "name": "Adamant Monolith", "resourceItemId": "adamant_ore", "miningLevel": 10, "respawnMs": 15000 },
+  { "id": "runic_node", "name": "Runic Crystal", "resourceItemId": "runic_ore", "miningLevel": 10, "respawnMs": 20000 },
+
+  { "id": "oak_tree", "name": "Oak Tree", "resourceItemId": "oak_log", "respawnMs": 4000 },
+  { "id": "birch_tree", "name": "Birch Grove", "resourceItemId": "birch_log", "respawnMs": 4500 },
+  { "id": "willow_tree", "name": "Willow Tree", "resourceItemId": "willow_log", "respawnMs": 5500 },
+  { "id": "maple_tree", "name": "Maple Tree", "resourceItemId": "maple_log", "respawnMs": 7000 },
+  { "id": "pine_tree", "name": "Pine Ridge", "resourceItemId": "pine_log", "respawnMs": 9000 },
+  { "id": "yew_tree", "name": "Yew Canopy", "resourceItemId": "yew_log", "respawnMs": 12000 },
+  { "id": "magic_tree", "name": "Magic Ancient Tree", "resourceItemId": "magic_log", "respawnMs": 18000 },
+
+  { "id": "shrimp_pond", "name": "Shrimp Pond", "resourceItemId": "raw_shrimp", "respawnMs": 3000 },
+  { "id": "trout_stream", "resourceItemId": "raw_trout", "name": "Trout Stream", "respawnMs": 5000 },
+  { "id": "salmon_river", "name": "Salmon River", "resourceItemId": "raw_salmon", "respawnMs": 7000 },
+
+  { "id": "rabbit_burrow", "name": "Rabbit Burrow", "resourceItemId": "raw_beef", "respawnMs": 3000 },
+  { "id": "deer_trail", "name": "Deer Trail", "resourceItemId": "raw_beef", "respawnMs": 5000 },
+  { "id": "boar_den", "name": "Boar Den", "resourceItemId": "raw_beef", "respawnMs": 6000 },
+  { "id": "bear_cave", "name": "Bear Cave", "resourceItemId": "raw_beef", "respawnMs": 8000 },
+  { "id": "wolf_den", "name": "Wolf Den", "resourceItemId": "wolf_pelt", "respawnMs": 7000 },
+  { "id": "drake_nest", "name": "Drake Nest", "resourceItemId": "dragon_scale", "respawnMs": 15000 },
+  { "id": "shadow_beast_lair", "name": "Shadow Beast Lair", "resourceItemId": "ancient_relic", "respawnMs": 20000 }
+]

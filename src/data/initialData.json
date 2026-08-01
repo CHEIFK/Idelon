@@ -1,0 +1,19 @@
+{
+  "game": {
+    "name": "Idle RPG Core",
+    "version": "0.1.0"
+  },
+  "currencies": ["gold", "gems"],
+  "skills": ["mining", "woodcutting", "combat"],
+  "items": {
+    "iron_ore": { "id": "iron_ore", "name": "Iron Ore", "type": "resource", "value": 5 },
+    "wood": { "id": "wood", "name": "Wood", "type": "resource", "value": 2 },
+    "iron_sword": { "id": "iron_sword", "name": "Iron Sword", "type": "weapon", "slot": "mainHand", "stats": { "attack": 10 } }
+  },
+  "recipes": {
+    "iron_sword": { "id": "iron_sword", "output": "iron_sword", "ingredients": { "iron_ore": 3 } }
+  },
+  "activities": {
+    "mine_iron": { "id": "mine_iron", "name": "Mine Iron", "skill": "mining", "durationMs": 3000, "rewards": [{ "item": "iron_ore", "amount": 1, "xp": 10 }] }
+  }
+}

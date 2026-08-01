@@ -1,0 +1,124 @@
+[
+  {
+    "id": "starter_village",
+    "name": "Starter Village",
+    "levelReq": 1,
+    "npcIds": ["blacksmith", "guide", "cook_marry", "fisherman_bob"],
+    "resourceIds": ["copper_node", "coal_node", "shrimp_pond", "rabbit_burrow"],
+    "enemyIds": ["goblin", "goblin_scout", "rat_giant"]
+  },
+  {
+    "id": "lead_quarry",
+    "name": "Lead Quarry",
+    "levelReq": 2,
+    "npcIds": ["quarry_master"],
+    "resourceIds": ["lead_node"],
+    "enemyIds": ["slime_green"]
+  },
+  {
+    "id": "sand_dunes",
+    "name": "Sand Dunes",
+    "levelReq": 3,
+    "npcIds": ["desert_nomad"],
+    "resourceIds": ["sand_node", "trout_stream"],
+    "enemyIds": ["bandit"]
+  },
+  {
+    "id": "titanium_caverns",
+    "name": "Titanium Caverns",
+    "levelReq": 5,
+    "npcIds": ["cave_miner"],
+    "resourceIds": ["titanium_node"],
+    "enemyIds": ["stone_golem"]
+  },
+  {
+    "id": "beryllium_caves",
+    "name": "Beryllium Caves",
+    "levelReq": 7,
+    "npcIds": ["deep_geologist"],
+    "resourceIds": ["beryllium_node"],
+    "enemyIds": ["cave_spider"]
+  },
+  {
+    "id": "thorium_depths",
+    "name": "Thorium Depths",
+    "levelReq": 8,
+    "npcIds": ["radiant_scholar"],
+    "resourceIds": ["thorium_node"],
+    "enemyIds": ["spectre"]
+  },
+  {
+    "id": "tungsten_core",
+    "name": "Tungsten Core",
+    "levelReq": 9,
+    "npcIds": ["master_smelter"],
+    "resourceIds": ["tungsten_node"],
+    "enemyIds": ["dark_knight"]
+  },
+  {
+    "id": "whispering_woods",
+    "name": "Whispering Woods",
+    "levelReq": 1,
+    "reqQuestId": "chop_birch_quest",
+    "npcIds": ["lumberjack_paul", "hunter_trapper"],
+    "resourceIds": ["oak_tree", "birch_tree", "deer_trail"],
+    "enemyIds": ["wolf", "dire_wolf"]
+  },
+  {
+    "id": "iron_mines",
+    "name": "Iron Mines",
+    "levelReq": 1,
+    "reqQuestId": "first_steps",
+    "npcIds": ["mine_master", "geologist_stone"],
+    "resourceIds": ["iron_node", "silver_node"],
+    "enemyIds": ["slime_green", "cave_spider"]
+  },
+  {
+    "id": "misty_mountains",
+    "name": "Misty Mountains",
+    "levelReq": 2,
+    "npcIds": ["hermit_sage", "alchemist_hazel"],
+    "resourceIds": ["gold_node", "willow_tree", "boar_den"],
+    "enemyIds": ["stone_golem", "troll"]
+  },
+  {
+    "id": "bandit_outpost",
+    "name": "Bandit Outpost",
+    "levelReq": 3,
+    "npcIds": ["bandit_informant", "captain_valiant"],
+    "resourceIds": ["trout_stream"],
+    "enemyIds": ["bandit", "bandit_chief", "orc_warrior"]
+  },
+  {
+    "id": "sunken_ruins",
+    "name": "Sunken Ruins",
+    "levelReq": 5,
+    "npcIds": ["high_priest", "crypt_keeper"],
+    "resourceIds": ["maple_tree", "bear_cave"],
+    "enemyIds": ["skeleton", "skeleton_archer", "zombie", "spectre"]
+  },
+  {
+    "id": "dragon_spire",
+    "name": "Dragon Spire",
+    "levelReq": 7,
+    "npcIds": ["dragon_slayer_vort", "dragon_priestess"],
+    "resourceIds": ["mithril_node", "drake_nest"],
+    "enemyIds": ["fire_drake", "ice_wyvern", "dark_knight"]
+  },
+  {
+    "id": "shadow_abyss",
+    "name": "Shadow Abyss",
+    "levelReq": 8,
+    "npcIds": ["shadow_monk", "wanderer_kael"],
+    "resourceIds": ["pine_tree", "shadow_beast_lair"],
+    "enemyIds": ["wraith", "vampire", "shadow_beast", "swamp_monster"]
+  },
+  {
+    "id": "celestial_sanctuary",
+    "name": "Celestial Sanctuary",
+    "levelReq": 10,
+    "npcIds": ["celestial_guardian", "elder_archmage"],
+    "resourceIds": ["adamant_node", "runic_node", "magic_tree"],
+    "enemyIds": ["gargoyle", "demon_scout", "demon_lord", "ancient_dragon", "abyssal_overlord"]
+  }
+]

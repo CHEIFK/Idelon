@@ -1,0 +1,29 @@
+{
+  "name": "idle-game-engine",
+  "version": "0.1.0",
+  "description": "Headless, UI-agnostic engine foundation for a multiplayer idle RPG",
+  "type": "module",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node --env-file=.env src/discord/botRunner.js",
+    "dev": "node --env-file=.env src/discord/botRunner.js",
+    "register": "node --env-file=.env scripts/registerCommands.js",
+    "sync-emojis": "node --env-file=.env scripts/syncEmojis.js",
+    "slice-assets": "node scripts/sliceAssets.js",
+    "validate-save": "node scripts/validateSave.js",
+    "migrate-save": "node scripts/migrateSave.js",
+    "test": "node --test tests/*.test.js"
+  },
+  "keywords": [
+    "idle-game",
+    "rpg-engine",
+    "headless-engine",
+    "discord-bot"
+  ],
+  "dependencies": {
+    "discord.js": "^14.18.0",
+    "sharp": "^0.33.5"
+  },
+  "author": "",
+  "license": "MIT"
+}

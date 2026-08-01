@@ -1,0 +1,39 @@
+[
+  { "id": "mining_copper_loot", "entries": [{ "itemId": "copper_ore", "amount": 1, "chance": 1.0 }] },
+  { "id": "mining_coal_loot", "entries": [{ "itemId": "coal", "amount": 1, "chance": 1.0 }] },
+  { "id": "mining_lead_loot", "entries": [{ "itemId": "lead_ore", "amount": 1, "chance": 1.0 }] },
+  { "id": "mining_sand_loot", "entries": [{ "itemId": "sand", "amount": 1, "chance": 1.0 }] },
+  { "id": "mining_graphite_loot", "entries": [{ "itemId": "graphite", "amount": 1, "chance": 1.0 }] },
+  { "id": "mining_titanium_loot", "entries": [{ "itemId": "titanium_ore", "amount": 1, "chance": 1.0 }] },
+  { "id": "mining_silicon_loot", "entries": [{ "itemId": "silicon", "amount": 1, "chance": 1.0 }] },
+  { "id": "mining_beryllium_loot", "entries": [{ "itemId": "beryllium_ore", "amount": 1, "chance": 1.0 }] },
+  { "id": "mining_thorium_loot", "entries": [{ "itemId": "thorium_ore", "amount": 1, "chance": 1.0 }] },
+  { "id": "mining_tungsten_loot", "entries": [{ "itemId": "tungsten_ore", "amount": 1, "chance": 1.0 }] },
+  { "id": "mining_metaglass_loot", "entries": [{ "itemId": "metaglass", "amount": 1, "chance": 1.0 }] },
+  { "id": "mining_phase_fabric_loot", "entries": [{ "itemId": "phase_fabric", "amount": 1, "chance": 1.0 }] },
+  { "id": "mining_oxide_loot", "entries": [{ "itemId": "oxide", "amount": 1, "chance": 1.0 }] },
+  { "id": "mining_carbide_loot", "entries": [{ "itemId": "carbide", "amount": 1, "chance": 1.0 }] },
+  { "id": "mining_surge_alloy_loot", "entries": [{ "itemId": "surge_alloy", "amount": 1, "chance": 1.0 }] },
+  { "id": "mining_iron_loot", "entries": [{ "itemId": "iron_ore", "amount": 1, "chance": 1.0 }] },
+  { "id": "mining_silver_loot", "entries": [{ "itemId": "silver_ore", "amount": 1, "chance": 1.0 }] },
+  { "id": "mining_gold_loot", "entries": [{ "itemId": "gold_ore", "amount": 1, "chance": 1.0 }] },
+  { "id": "mining_mithril_loot", "entries": [{ "itemId": "mithril_ore", "amount": 1, "chance": 1.0 }] },
+
+  { "id": "woodcut_oak_loot", "entries": [{ "itemId": "wood_log", "amount": 1, "chance": 1.0 }] },
+  { "id": "woodcut_birch_loot", "entries": [{ "itemId": "birch_log", "amount": 1, "chance": 1.0 }] },
+  { "id": "woodcut_willow_loot", "entries": [{ "itemId": "willow_log", "amount": 1, "chance": 1.0 }] },
+  { "id": "woodcut_maple_loot", "entries": [{ "itemId": "maple_log", "amount": 1, "chance": 1.0 }] },
+  { "id": "woodcut_pine_loot", "entries": [{ "itemId": "pine_log", "amount": 1, "chance": 1.0 }] },
+
+  { "id": "fishing_shrimp_loot", "entries": [{ "itemId": "raw_shrimp", "amount": 1, "chance": 1.0 }] },
+  { "id": "fishing_trout_loot", "entries": [{ "itemId": "raw_trout", "amount": 1, "chance": 1.0 }] },
+
+  { "id": "hunting_game_loot", "entries": [{ "itemId": "raw_beef", "amount": 1, "chance": 1.0 }] },
+
+  { "id": "goblin_loot", "entries": [{ "itemId": "goblin_ear", "amount": 1, "chance": 0.8 }, { "itemId": "copper_ore", "amount": 2, "chance": 0.5 }] },
+  { "id": "wolf_loot", "entries": [{ "itemId": "wolf_pelt", "amount": 1, "chance": 0.9 }, { "itemId": "raw_beef", "amount": 1, "chance": 0.6 }] },
+  { "id": "bandit_loot", "entries": [{ "itemId": "iron_sword", "amount": 1, "chance": 0.3 }] },
+  { "id": "skeleton_loot", "entries": [{ "itemId": "iron_helmet", "amount": 1, "chance": 0.2 }] },
+  { "id": "dragon_loot", "entries": [{ "itemId": "dragon_scale", "amount": 1, "chance": 1.0 }, { "itemId": "gold_ore", "amount": 5, "chance": 0.7 }] },
+  { "id": "enemy_shadow_beast_loot", "entries": [{ "itemId": "ancient_relic", "amount": 1, "chance": 1.0 }, { "itemId": "mithril_ore", "amount": 3, "chance": 0.8 }] }
+]

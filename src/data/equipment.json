@@ -1,0 +1,26 @@
+[
+  { "id": "bronze_sword", "name": "Bronze Sword", "slot": "weapon", "levelReq": 1, "stats": { "attack": 6, "criticalChance": 0.02 } },
+  { "id": "iron_sword", "name": "Iron Sword", "slot": "weapon", "levelReq": 1, "stats": { "attack": 10, "criticalChance": 0.05 } },
+  { "id": "steel_sword", "name": "Steel Sword", "slot": "weapon", "levelReq": 3, "stats": { "attack": 22, "criticalChance": 0.08 } },
+  { "id": "mithril_sword", "name": "Mithril Sword", "slot": "weapon", "levelReq": 8, "stats": { "attack": 45, "criticalChance": 0.12 } },
+
+  { "id": "iron_pickaxe", "name": "Iron Pickaxe", "slot": "weapon", "levelReq": 1, "stats": { "miningPower": 15, "attack": 5 } },
+  { "id": "steel_pickaxe", "name": "Steel Pickaxe", "slot": "weapon", "levelReq": 4, "stats": { "miningPower": 35, "attack": 12 } },
+  { "id": "iron_hatchet", "name": "Iron Hatchet", "slot": "weapon", "levelReq": 1, "stats": { "woodcuttingPower": 15, "attack": 5 } },
+  { "id": "steel_hatchet", "name": "Steel Hatchet", "slot": "weapon", "levelReq": 4, "stats": { "woodcuttingPower": 35, "attack": 12 } },
+
+  { "id": "bronze_helmet", "name": "Bronze Helmet", "slot": "helmet", "levelReq": 1, "stats": { "defense": 4, "health": 10 } },
+  { "id": "iron_helmet", "name": "Iron Helmet", "slot": "helmet", "levelReq": 1, "stats": { "defense": 8, "health": 20 } },
+  { "id": "steel_helmet", "name": "Steel Helmet", "slot": "helmet", "levelReq": 3, "stats": { "defense": 16, "health": 45 } },
+  { "id": "mithril_helmet", "name": "Mithril Helmet", "slot": "helmet", "levelReq": 8, "stats": { "defense": 30, "health": 100 } },
+
+  { "id": "bronze_chest", "name": "Bronze Chestplate", "slot": "chest", "levelReq": 1, "stats": { "defense": 8, "health": 20 } },
+  { "id": "iron_chest", "name": "Iron Chestplate", "slot": "chest", "levelReq": 1, "stats": { "defense": 15, "health": 40 } },
+  { "id": "steel_chest", "name": "Steel Chestplate", "slot": "chest", "levelReq": 3, "stats": { "defense": 30, "health": 80 } },
+  { "id": "mithril_chest", "name": "Mithril Chestplate", "slot": "chest", "levelReq": 8, "stats": { "defense": 60, "health": 180 } },
+
+  { "id": "lumberjack_ring", "name": "Lumberjack Ring", "slot": "ring", "levelReq": 1, "stats": { "woodcuttingPower": 10, "luck": 3 } },
+  { "id": "miner_ring", "name": "Miner Ring", "slot": "ring", "levelReq": 1, "stats": { "miningPower": 10, "luck": 3 } },
+  { "id": "ruby_amulet", "name": "Ruby Amulet", "slot": "amulet", "levelReq": 2, "stats": { "attack": 8, "health": 15 } },
+  { "id": "diamond_ring", "name": "Diamond Ring", "slot": "ring", "levelReq": 5, "stats": { "luck": 10, "criticalChance": 0.10 } }
+]

@@ -1,0 +1,25 @@
+[
+  { "id": "mine_copper", "name": "Mine Copper Vein", "skillId": "mining", "areaId": "starter_village", "levelReq": 1, "durationMs": 2500, "xpPerCycle": 10, "lootTableId": "mining_copper_loot", "currencyRewards": { "gold": 1 } },
+  { "id": "mine_coal", "name": "Mine Coal Seam", "skillId": "mining", "areaId": "starter_village", "levelReq": 1, "durationMs": 2500, "xpPerCycle": 12, "lootTableId": "mining_coal_loot", "currencyRewards": { "gold": 1 } },
+  { "id": "mine_lead", "name": "Mine Lead Deposit", "skillId": "mining", "areaId": "lead_quarry", "levelReq": 2, "durationMs": 3000, "xpPerCycle": 18, "lootTableId": "mining_lead_loot", "currencyRewards": { "gold": 2 } },
+  { "id": "mine_sand", "name": "Extract Quartz Sand", "skillId": "mining", "areaId": "sand_dunes", "levelReq": 3, "durationMs": 3500, "xpPerCycle": 25, "lootTableId": "mining_sand_loot", "currencyRewards": { "gold": 3 } },
+  { "id": "mine_titanium", "name": "Mine Titanium Seam", "skillId": "mining", "areaId": "titanium_caverns", "levelReq": 5, "durationMs": 4500, "xpPerCycle": 40, "lootTableId": "mining_titanium_loot", "currencyRewards": { "gold": 5 } },
+  { "id": "mine_beryllium", "name": "Mine Beryllium Vein", "skillId": "mining", "areaId": "beryllium_caves", "levelReq": 7, "durationMs": 5500, "xpPerCycle": 65, "lootTableId": "mining_beryllium_loot", "currencyRewards": { "gold": 8 } },
+  { "id": "mine_thorium", "name": "Extract Thorium Ore", "skillId": "mining", "areaId": "thorium_depths", "levelReq": 8, "durationMs": 7000, "xpPerCycle": 100, "lootTableId": "mining_thorium_loot", "currencyRewards": { "gold": 12 } },
+  { "id": "mine_tungsten", "name": "Mine Tungsten Monolith", "skillId": "mining", "areaId": "tungsten_core", "levelReq": 9, "durationMs": 9000, "xpPerCycle": 150, "lootTableId": "mining_tungsten_loot", "currencyRewards": { "gold": 20 } },
+  { "id": "mine_iron", "name": "Mine Iron Deposit", "skillId": "mining", "areaId": "iron_mines", "levelReq": 1, "durationMs": 3000, "xpPerCycle": 15, "lootTableId": "mining_iron_loot", "currencyRewards": { "gold": 1 } },
+  { "id": "mine_silver", "name": "Mine Silver Seam", "skillId": "mining", "areaId": "iron_mines", "levelReq": 3, "durationMs": 3500, "xpPerCycle": 25, "lootTableId": "mining_silver_loot", "currencyRewards": { "gold": 2 } },
+  { "id": "mine_gold", "name": "Mine Gold Vein", "skillId": "mining", "areaId": "misty_mountains", "levelReq": 5, "durationMs": 4000, "xpPerCycle": 40, "lootTableId": "mining_gold_loot", "currencyRewards": { "gold": 3 } },
+  { "id": "mine_mithril", "name": "Mine Mithril Spire", "skillId": "mining", "areaId": "dragon_spire", "levelReq": 8, "durationMs": 5000, "xpPerCycle": 70, "lootTableId": "mining_mithril_loot", "currencyRewards": { "gold": 5 } },
+
+  { "id": "woodcut_oak", "name": "Chop Oak Tree", "skillId": "woodcutting", "levelReq": 1, "durationMs": 3000, "xpPerCycle": 10, "lootTableId": "woodcut_oak_loot" },
+  { "id": "woodcut_birch", "name": "Chop Birch Grove", "skillId": "woodcutting", "levelReq": 2, "durationMs": 3200, "xpPerCycle": 15, "lootTableId": "woodcut_birch_loot" },
+  { "id": "woodcut_willow", "name": "Chop Willow Tree", "skillId": "woodcutting", "levelReq": 4, "durationMs": 3800, "xpPerCycle": 30, "lootTableId": "woodcut_willow_loot" },
+  { "id": "woodcut_maple", "name": "Chop Maple Tree", "skillId": "woodcutting", "levelReq": 6, "durationMs": 4200, "xpPerCycle": 50, "lootTableId": "woodcut_maple_loot" },
+  { "id": "woodcut_pine", "name": "Chop Pine Ridge", "skillId": "woodcutting", "levelReq": 8, "durationMs": 4800, "xpPerCycle": 80, "lootTableId": "woodcut_pine_loot" },
+
+  { "id": "fish_shrimp", "name": "Net Shrimps", "skillId": "fishing", "levelReq": 1, "durationMs": 2500, "xpPerCycle": 10, "lootTableId": "fishing_shrimp_loot" },
+  { "id": "fish_trout", "name": "Bait Trout", "skillId": "fishing", "levelReq": 3, "durationMs": 3500, "xpPerCycle": 25, "lootTableId": "fishing_trout_loot" },
+
+  { "id": "hunt_game", "name": "Trap Small Game", "skillId": "hunting", "levelReq": 1, "durationMs": 3000, "xpPerCycle": 12, "lootTableId": "hunting_game_loot" }
+]
