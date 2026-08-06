@@ -7,7 +7,7 @@ export default {
   async execute(interaction, gameService) {
     try {
       const inv = await gameService.getInventory(interaction.user.id);
-      return { embed: createInventoryEmbed(interaction.user.username, inv) };
+      return { embed: createInventoryEmbed(interaction.user.username, inv, gameService.engine.content) };
     } catch (err) {
       return { embed: createErrorEmbed('Inventory Error', err.message) };
     }

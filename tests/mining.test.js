@@ -18,9 +18,9 @@ test('Mining activity lifecycle with offline progression and content loader inte
   assert.equal(player.currentActivity.id, ACTIVITIES.MINING_IRON);
   assert.equal(eventsRecorded.some(e => e.type === EVENTS.ACTIVITY_STARTED), true);
 
-  // 2. Simulate 9 seconds of offline time (3 cycles of 3000ms)
+  // 2. Simulate offline time for 3 cycles (3 cycles of durationMs / 3 at 3x speed)
   const durationMs = engine.content.getActivity(ACTIVITIES.MINING_IRON).durationMs;
-  player.currentActivity.lastClaimed -= (durationMs * 3 + 500);
+  player.currentActivity.lastClaimed -= ((durationMs / 3) * 3 + 100);
 
   // 3. Claim rewards
   const claimResult = engine.activities.claim(player);

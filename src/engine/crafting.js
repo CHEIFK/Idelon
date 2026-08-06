@@ -25,6 +25,9 @@ export class CraftingModule {
     skillsModule = this.engine?.skills
   ) {
     if (!contentLoader) return { canCraft: false, reason: 'no_content_loader' };
+    if (!Number.isInteger(count) || count <= 0) {
+      return { canCraft: false, reason: 'invalid_quantity' };
+    }
     const recipe = contentLoader.getRecipe(recipeId);
     if (!recipe) return { canCraft: false, reason: 'recipe_not_found' };
 
@@ -37,14 +40,21 @@ export class CraftingModule {
 
     if (!Array.isArray(recipe.ingredients)) return { canCraft: false, reason: 'invalid_ingredients' };
 
+    const requirements = new Map();
     for (const ing of recipe.ingredients) {
-      const requiredQty = ing.amount * count;
+      if (!ing || typeof ing.itemId !== 'string' || !Number.isInteger(ing.amount) || ing.amount <= 0) {
+        return { canCraft: false, reason: 'invalid_ingredients' };
+      }
+      requirements.set(ing.itemId, (requirements.get(ing.itemId) || 0) + ing.amount * count);
+    }
+
+    for (const [itemId, requiredQty] of requirements) {
       const hasMat = inventoryModule
-        ? inventoryModule.hasItem(player, ing.itemId, requiredQty)
-        : ((player.inventory[ing.itemId] || 0) >= requiredQty);
+        ? inventoryModule.hasItem(player, itemId, requiredQty)
+        : ((player.inventory[itemId] || 0) >= requiredQty);
 
       if (!hasMat) {
-        return { canCraft: false, reason: 'insufficient_materials', missingItem: ing.itemId, requiredQty };
+        return { canCraft: false, reason: 'insufficient_materials', missingItem: itemId, requiredQty };
       }
     }
 
@@ -119,6 +129,7 @@ export class CraftingModule {
     if (xpPerUnit > 0 && recipe.skillId && skillsModule) {
       xpGained = xpPerUnit * count;
       const xpRes = skillsModule.addXP(player, recipe.skillId, xpGained);
+      xpGained = xpRes.xpGained ?? xpGained;
 
       if (eventsBus) {
         eventsBus.emit(EVENTS.XP_GAINED, {

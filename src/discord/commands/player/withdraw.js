@@ -5,8 +5,8 @@ export default {
   category: 'inventory',
   description: 'Withdraw items from bank storage into your inventory.',
   options: [
-    { name: 'item', type: 'STRING', required: true },
-    { name: 'amount', type: 'STRING', required: false }
+    { name: 'item', description: 'Item name or ID to withdraw', type: 'STRING', required: true },
+    { name: 'amount', description: 'Positive quantity, or all', type: 'STRING', required: false }
   ],
   async execute(interaction, gameService) {
     try {
@@ -15,7 +15,10 @@ export default {
 
       const res = await gameService.withdrawItem(interaction.user.id, itemId, amountRaw);
       if (!res.success) {
-        return { embed: createErrorEmbed('Withdraw Failed', `You do not have any **${itemId}** in your bank storage.`) };
+        const message = res.message || (res.reason === 'invalid_quantity'
+          ? 'Quantity must be a positive integer.'
+          : `You do not have any **${itemId}** in your bank storage.`);
+        return { embed: createErrorEmbed('Withdraw Failed', message) };
       }
 
       const display = getItemDisplay(itemId, gameService.engine.content);

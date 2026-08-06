@@ -55,9 +55,9 @@ test('Dev toolkit commands execution pipeline and audit logging', async () => {
   const skills = await game.getSkills(targetId);
   assert.equal(skills.mining.xp, 500);
 
-  await bot.handleCommandInteraction(mockDevInteraction('set-level', { target_user: targetId, amount: 25 }, adminId));
+  await bot.handleCommandInteraction(mockDevInteraction('set-level', { target_user: targetId, amount: 60 }, adminId));
   const profile = await game.getProfile(targetId);
-  assert.equal(profile.level, 25);
+  assert.equal(profile.level, 60);
 
   // 4. give-currency
   await bot.handleCommandInteraction(mockDevInteraction('give-currency', { target_user: targetId, currency: 'gold', amount: 1000 }, adminId));
@@ -84,4 +84,30 @@ test('Dev toolkit rejects unauthorized user', async () => {
 
   const res = await bot.handleCommandInteraction(mockDevInteraction('give-item', { item: 'iron_sword' }, 'unauthorized_user'));
   assert.equal(res.embed.title.includes('Permission Denied'), true);
+});
+
+test('Dev spawn-enemy rejects missing or unknown enemy instead of running a bulk hunt', async () => {
+  const game = await createGameInstance();
+  const devService = createDevService(game, ['dev_spawn_guard'], true);
+  const bot = createDiscordBot(game, devService);
+  const result = await bot.handleTextMessage('.dev spawn-enemy not_a_monster', { id: 'dev_spawn_guard', username: 'Dev' });
+  assert.equal(result.embed.title, '❌ Dev Action Error');
+  assert.match(result.embed.description, /does not exist/);
+});
+
+test('Dev force-activity-complete persists the forced timestamp before claiming', async () => {
+  const game = await createGameInstance();
+  const devService = createDevService(game, ['dev_force'], true);
+  const player = await game.getPlayer('usr_force_activity');
+  await game.mine(player.id, 'mine_copper');
+
+  const before = await game.getPlayer(player.id);
+  before.currentActivity.lastClaimed = Date.now();
+  await game.savePlayer(before);
+  const result = await devService.forceActivityComplete('dev_force', player.id);
+
+  assert.ok(result);
+  assert.ok(result.cyclesCompleted > 0, 'The forced hour should produce claimable cycles');
+  const after = await game.getPlayer(player.id);
+  assert.ok(after.skills.mining.xp > 0);
 });

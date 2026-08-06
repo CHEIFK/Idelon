@@ -5,8 +5,8 @@ export default {
   category: 'economy',
   description: 'Sell items from your inventory for gold (or .sell all to sell all ores).',
   options: [
-    { name: 'item', type: 'STRING', required: false },
-    { name: 'amount', type: 'STRING', required: false }
+    { name: 'item', description: 'Item name or ID to sell, or all for every ore', type: 'STRING', required: false },
+    { name: 'amount', description: 'Positive quantity to sell', type: 'STRING', required: false }
   ],
   async execute(interaction, gameService) {
     try {
@@ -59,6 +59,9 @@ export default {
 
       // Check if user typed .sell all again after parameter normalization
       if (itemInput.trim().toLowerCase() === 'all') {
+        if (amountRaw) {
+          return { embed: createErrorEmbed('Sale Failed', 'Bulk ore sales do not accept a quantity.') };
+        }
         const resAll = await gameService.sellItem(interaction.user.id, 'all');
         if (!resAll.success) {
           return { embed: createErrorEmbed('Sale Failed', 'You do not own any **Ores** in your inventory to sell.') };

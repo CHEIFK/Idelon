@@ -8,13 +8,15 @@ import { BossesModule } from './bosses.js';
 export class CombatModule {
   constructor(engine = null) {
     this.engine = engine;
-    this.enemies = new EnemiesModule();
-    this.bosses = new BossesModule();
+    this.enemies = new EnemiesModule(engine);
+    this.bosses = new BossesModule(engine);
     this.lastResult = null;
   }
 
   setEngine(engine) {
     this.engine = engine;
+    this.enemies.setEngine(engine);
+    this.bosses.setEngine(engine);
   }
 
   start(player, enemyId) {
@@ -40,20 +42,23 @@ export class CombatModule {
     const enemyDef = contentLoader.getEnemy(enemyId);
     if (!enemyDef) throw new Error(`Enemy '${enemyId}' not found in content loader.`);
 
-    const playerCombatLevel = skillsModule ? skillsModule.getLevel(player, 'combat') : 1;
-    if (enemyDef.levelReq && playerCombatLevel < enemyDef.levelReq) {
-      return { success: false, reason: 'level_too_low', requiredLevel: enemyDef.levelReq };
-    }
-
     // Combine player base stats with equipped gear bonuses
     const equippedStats = equipmentModule ? equipmentModule.getTotalStats(player) : {};
+    const potionModifiers = this.engine?.potions;
+    potionModifiers?.process?.(player);
+    const potionModifier = stat => potionModifiers?.getModifier?.(player, stat) || 0;
+    const playerAttributes = this.engine?.attributes ? this.engine.attributes.getAttributes(player) : (player.attributes || {});
+    const maxHp = this.engine?.attributes
+      ? this.engine.attributes.calculateMaxHealth(player, equippedStats)
+      : 100 + (player.level * 10) + (equippedStats.health || 0);
     const playerStats = {
-      attack: 10 + (player.level * 2) + (equippedStats.attack || 0),
-      defense: equippedStats.defense || 0,
-      maxHp: 100 + (player.level * 10) + (equippedStats.health || 0),
-      hp: 100 + (player.level * 10) + (equippedStats.health || 0),
+      attack: 10 + (player.level * 2) + (equippedStats.attack || 0) + potionModifier('attack'),
+      strength: (playerAttributes.strength || 1) - 1 + potionModifier('strength'), // -1 because base level 1 gives 0 bonus
+      defense: (equippedStats.defense || 0) + potionModifier('defense'),
+      maxHp,
+      hp: typeof player.hp === 'number' && Number.isFinite(player.hp) ? Math.min(Math.max(0, player.hp), maxHp) : maxHp,
       criticalChance: equippedStats.criticalChance || 0.05,
-      accuracy: equippedStats.accuracy || 0
+      accuracy: (equippedStats.accuracy || 0) + potionModifier('accuracy')
     };
 
     // Fresh enemy instance for every fight (respawn support)
@@ -127,9 +132,19 @@ export class CombatModule {
     }
 
     const victory = enemyState.hp <= 0 && playerStats.hp > 0;
+    const playerDied = playerStats.hp <= 0;
     const loot = [];
     const currenciesGained = {};
     let xpGained = 0;
+    let durabilityChanges = { broken: [], reduced: [], replacements: [] };
+    let equipmentChanges = { equipped: [] };
+
+    if (victory && equipmentModule) {
+      const durabilityLoss = Math.max(1, Math.floor((enemyState.attack || 5) / 10));
+      if (typeof equipmentModule.reduceDurability === 'function') {
+        durabilityChanges = equipmentModule.reduceDurability(player, durabilityLoss, contentLoader, inventoryModule, eventsBus);
+      }
+    }
 
     if (victory) {
       // Award random Combat XP between COMBAT_XP_MIN and COMBAT_XP_MAX (inclusive)
@@ -138,6 +153,7 @@ export class CombatModule {
       xpGained = Math.floor(Math.random() * (maxXp - minXp + 1)) + minXp;
       if (skillsModule) {
         const xpRes = skillsModule.addXP(player, 'combat', xpGained);
+        xpGained = xpRes.xpGained ?? xpGained;
         if (eventsBus) {
           eventsBus.emit(EVENTS.XP_GAINED, {
             playerId: player.id,
@@ -157,7 +173,9 @@ export class CombatModule {
       }
 
       // Roll Loot Table
-      const droppedLoot = generateCombatLoot(enemyDef, contentLoader);
+      const equipmentLuck = typeof equippedStats.luck === 'number' ? equippedStats.luck : 0;
+      const potionLuck = potionModifier('luck');
+      const droppedLoot = generateCombatLoot(enemyDef, contentLoader, equipmentLuck + potionLuck);
       for (const drop of droppedLoot) {
         if (inventoryModule) {
           inventoryModule.addItem(player, drop.itemId, drop.amount);
@@ -178,11 +196,18 @@ export class CombatModule {
           const baseAmt = amt * 20;
           const minAmt = Math.max(1, Math.round(baseAmt * 0.75));
           const maxAmt = Math.max(minAmt, Math.round(baseAmt * 1.25));
-          const totalAmt = Math.floor(Math.random() * (maxAmt - minAmt + 1)) + minAmt;
+          const baseAmount = Math.floor(Math.random() * (maxAmt - minAmt + 1)) + minAmt;
+          const totalAmt = curr === 'gold'
+            ? Math.max(1, Math.round(baseAmount * (1 + potionModifier('wealth') / 100)))
+            : baseAmount;
 
           economyModule.addCurrency(player, curr, totalAmt);
           currenciesGained[curr] = totalAmt;
         }
+      }
+
+      if (victory && equipmentModule && typeof equipmentModule.autoEquipBest === 'function') {
+        equipmentChanges = equipmentModule.autoEquipBest(player, contentLoader, inventoryModule, eventsBus);
       }
 
       if (eventsBus) {
@@ -201,6 +226,17 @@ export class CombatModule {
             loot
           });
         }
+
+        if (enemyDef.isBoss === true) {
+          eventsBus.emit(EVENTS.BOSS_KILLED, {
+            playerId: player.id,
+            bossId: enemyDef.id,
+            turns: turnCount,
+            xpGained,
+            loot,
+            currenciesGained
+          });
+        }
       }
     } else {
       if (eventsBus) {
@@ -215,18 +251,27 @@ export class CombatModule {
     const result = {
       success: true,
       victory,
+      playerDied,
       attackerId: player.id || 'entity',
       defenderId: enemyState.id || 'entity',
-      damageDealt: turns.find(t => t.attacker === 'player')?.damageDealt || 10,
+      damageDealt: turns
+        .filter(turn => turn.attacker === 'player')
+        .reduce((total, turn) => total + turn.damageDealt, 0),
       turnsCount: turnCount,
       turns,
       xpGained,
       loot,
       currenciesGained,
+      durabilityChanges,
+      equipmentChanges,
       playerFinalHp: playerStats.hp,
+      maxHp: playerStats.maxHp,
       enemyFinalHp: enemyState.hp
     };
 
+    result.isBoss = enemyDef.isBoss === true;
+
+    player.hp = playerStats.hp;
     this.lastResult = result;
     return result;
   }

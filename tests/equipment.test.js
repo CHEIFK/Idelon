@@ -63,6 +63,31 @@ test('Equipment system equip, inventory swap, stat aggregation, and events', asy
   assert.equal(eventsRecorded.some(e => e.type === EVENTS.EQUIPMENT_UNEQUIPPED), true);
 });
 
+test('Loaded equipment uses canonical stats and durability metadata', async () => {
+  const engine = await createEngine();
+  const player = engine.player.create('usr_loaded_canonical_gear', 'Legacy Gear Hero');
+  player.equipment.weapon = {
+    id: 'iron_sword',
+    name: 'Legacy Sword',
+    slot: 'mainHand',
+    stats: { attack: 9999 },
+    durability: 999,
+    maxDurability: 999
+  };
+  await engine.player.save(player);
+
+  const loaded = await engine.player.load(player.id);
+  assert.equal(loaded.equipment.weapon.name, 'Iron Sword');
+  assert.equal(loaded.equipment.weapon.slot, 'weapon');
+  assert.deepEqual(loaded.equipment.weapon.stats, { attack: 10, criticalChance: 0.05 });
+  assert.equal(loaded.equipment.weapon.maxDurability, 100);
+  assert.equal(loaded.equipment.weapon.durability, 100);
+  assert.equal(engine.equipment.getTotalStats(loaded).attack, 10);
+
+  const persisted = await engine.player.load(player.id);
+  assert.equal(persisted.equipment.weapon.stats.attack, 10);
+});
+
 test('Prevent equipping items not in inventory or invalid items', async () => {
   const engine = await createEngine();
   const player = engine.player.create('usr_gear_fail', 'FailHero');
@@ -77,4 +102,33 @@ test('Prevent equipping items not in inventory or invalid items', async () => {
   const res2 = engine.equipment.equip(player, 'iron_ore');
   assert.equal(res2.success, false);
   assert.equal(res2.reason, 'not_equipable');
+});
+
+test('Equipment enforces its level requirement for direct equip calls', async () => {
+  const engine = await createEngine();
+  const player = engine.player.create('usr_gear_level_guard', 'Novice');
+  engine.inventory.addItem(player, 'steel_sword', 1);
+
+  const result = engine.equipment.equip(player, 'steel_sword');
+  assert.equal(result.success, false);
+  assert.equal(result.reason, 'level_too_low');
+  assert.equal(player.equipment.weapon, undefined);
+  assert.equal(player.inventory.steel_sword, 1);
+});
+
+test('Equipment cannot be re-equipped to repair durability and rejects invalid durability loss', async () => {
+  const engine = await createEngine();
+  const player = engine.player.create('usr_gear_durability_guard', 'DurabilityHero');
+  engine.inventory.addItem(player, 'iron_sword', 2);
+  assert.equal(engine.equipment.equip(player, 'iron_sword').success, true);
+  player.equipment.weapon.durability = 12;
+
+  const reEquip = engine.equipment.equip(player, 'iron_sword');
+  assert.equal(reEquip.success, false);
+  assert.equal(reEquip.reason, 'already_equipped');
+  assert.equal(player.equipment.weapon.durability, 12);
+
+  const before = player.equipment.weapon.durability;
+  engine.equipment.reduceDurability(player, -10, engine.content, engine.inventory, engine.events);
+  assert.equal(player.equipment.weapon.durability, before);
 });

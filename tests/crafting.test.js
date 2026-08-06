@@ -66,3 +66,43 @@ test('Complex crafting recipe requiring multiple ingredients (Iron Sword)', asyn
   assert.equal(engine.inventory.hasItem(player, 'wood_log', 1), false);
   assert.equal(engine.inventory.hasItem(player, 'iron_sword', 1), true);
 });
+
+test('Crafting rejects duplicate ingredient requirements that exceed the stack', async () => {
+  const engine = await createEngine();
+  const player = engine.player.create('usr_duplicate_recipe', 'Careful Crafter');
+  engine.inventory.addItem(player, 'copper_ore', 1);
+
+  const recipe = {
+    id: 'duplicate_copper_recipe',
+    name: 'Duplicate Copper Recipe',
+    skillId: 'smithing',
+    levelReq: 1,
+    xpPerCraft: 1,
+    resultItemId: 'copper_bar',
+    resultAmount: 1,
+    ingredients: [
+      { itemId: 'copper_ore', amount: 1 },
+      { itemId: 'copper_ore', amount: 1 }
+    ]
+  };
+  const loader = { getRecipe: id => id === recipe.id ? recipe : null };
+  const result = engine.crafting.craft(player, recipe.id, 1, loader, engine.inventory, engine.skills);
+
+  assert.equal(result.success, false);
+  assert.equal(result.reason, 'insufficient_materials');
+  assert.equal(player.inventory.copper_ore, 1);
+  assert.equal(player.inventory.copper_bar, undefined);
+});
+
+test('Crafting rejects fractional and non-positive quantities without state changes', async () => {
+  const engine = await createEngine();
+  const player = engine.player.create('usr_invalid_craft_quantity', 'Exact Crafter');
+  engine.inventory.addItem(player, 'copper_ore', 2);
+
+  for (const count of [0, -1, 1.5, '2']) {
+    const result = engine.crafting.craft(player, 'smelt_copper_bar', count);
+    assert.equal(result.success, false);
+    assert.equal(result.reason, 'invalid_quantity');
+  }
+  assert.equal(player.inventory.copper_ore, 2);
+});

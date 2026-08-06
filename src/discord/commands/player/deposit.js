@@ -5,8 +5,8 @@ export default {
   category: 'inventory',
   description: 'Deposit items from your inventory into bank storage.',
   options: [
-    { name: 'item', type: 'STRING', required: true },
-    { name: 'amount', type: 'STRING', required: false }
+    { name: 'item', description: 'Item name or ID to deposit', type: 'STRING', required: true },
+    { name: 'amount', description: 'Positive quantity, or all', type: 'STRING', required: false }
   ],
   async execute(interaction, gameService) {
     try {
@@ -15,7 +15,10 @@ export default {
 
       const res = await gameService.depositItem(interaction.user.id, itemId, amountRaw);
       if (!res.success) {
-        return { embed: createErrorEmbed('Deposit Failed', `You do not own any **${itemId}** in your inventory.`) };
+        const message = res.message || (res.reason === 'invalid_quantity'
+          ? 'Quantity must be a positive integer.'
+          : `You do not own any **${itemId}** in your inventory.`);
+        return { embed: createErrorEmbed('Deposit Failed', message) };
       }
 
       const display = getItemDisplay(itemId, gameService.engine.content);

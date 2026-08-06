@@ -3,7 +3,7 @@
     "name": "Idle RPG Core",
     "version": "0.1.0"
   },
-  "currencies": ["gold", "gems"],
+  "currencies": ["gold", "sterlings"],
   "skills": ["mining", "woodcutting", "combat"],
   "items": {
     "iron_ore": { "id": "iron_ore", "name": "Iron Ore", "type": "resource", "value": 5 },

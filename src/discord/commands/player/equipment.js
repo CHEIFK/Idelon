@@ -7,7 +7,7 @@ export default {
   async execute(interaction, gameService) {
     try {
       const eq = await gameService.getEquipment(interaction.user.id);
-      return { embed: createEquipmentEmbed(interaction.user.username, eq) };
+      return { embed: createEquipmentEmbed(interaction.user.username, eq, gameService.engine.content) };
     } catch (err) {
       return { embed: createErrorEmbed('Equipment Error', err.message) };
     }

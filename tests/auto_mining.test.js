@@ -10,6 +10,7 @@ test('Auto-mine (.mine) gathers resources satisfying Sector progression (visited
   // Set hero level to 5 so travel is permitted to lead_quarry, sand_dunes, titanium_caverns
   const player = await game.getPlayer(playerId);
   player.heroXp = 1100; // Hero level 5 threshold
+  player.skills.mining = { level: 5, xp: 1100 }; // Resource skill gates remain independent
   await game.savePlayer(player);
 
   // 1. In Starter Village -> Copper, Coal
@@ -30,8 +31,16 @@ test('Auto-mine (.mine) gathers resources satisfying Sector progression (visited
   assert.ok(leadIds.includes('mine_lead'), 'Lead Quarry includes Lead');
   assert.ok(!leadIds.includes('mine_titanium'), 'Lead Quarry does NOT include Titanium');
 
-  // 3. Travel to Titanium Caverns -> Copper, Coal, Lead, Sand, Titanium
+  // 3. Reach Hero Level 10 and travel to Sand Dunes -> Sand becomes available.
+  const playerAtSand = await game.getPlayer(playerId);
+  playerAtSand.heroXp = 4600; // Hero level 10 threshold
+  await game.savePlayer(playerAtSand);
   await game.travel(playerId, 'sand_dunes');
+
+  // 4. Reach Hero Level 15 and travel to Titanium Caverns.
+  const playerAtTitanium = await game.getPlayer(playerId);
+  playerAtTitanium.heroXp = 10600; // Hero level 15 threshold
+  await game.savePlayer(playerAtTitanium);
   await game.travel(playerId, 'titanium_caverns');
 
   const resTitanium = await game.mineAuto(playerId);

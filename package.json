@@ -6,13 +6,13 @@
   "main": "src/index.js",
   "scripts": {
     "start": "node --env-file=.env src/discord/botRunner.js",
-    "dev": "node --env-file=.env src/discord/botRunner.js",
+    "dev": "nodemon --env-file=.env src/discord/botRunner.js",
     "register": "node --env-file=.env scripts/registerCommands.js",
     "sync-emojis": "node --env-file=.env scripts/syncEmojis.js",
     "slice-assets": "node scripts/sliceAssets.js",
     "validate-save": "node scripts/validateSave.js",
     "migrate-save": "node scripts/migrateSave.js",
-    "test": "node --test tests/*.test.js"
+    "test": "IDELON_TEST=1 node --test tests/*.test.js"
   },
   "keywords": [
     "idle-game",
@@ -21,9 +21,14 @@
     "discord-bot"
   ],
   "dependencies": {
+    "better-sqlite3": "^13.0.3",
     "discord.js": "^14.18.0",
     "sharp": "^0.33.5"
   },
   "author": "",
-  "license": "MIT"
+  "license": "MIT",
+  "allowScripts": {
+    "better-sqlite3": true,
+    "sharp@0.33.5": true
+  }
 }

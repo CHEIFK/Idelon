@@ -1,6 +1,7 @@
 import process from 'node:process';
 import { Client, GatewayIntentBits } from 'discord.js';
 import { createGameInstance, createDevService, createDiscordBot } from '../index.js';
+import { HUNT_COOLDOWN_MS, setHuntButtonDisabled } from './huntUi.js';
 
 // Load .env variables
 try {
@@ -35,7 +36,44 @@ export async function launchBot() {
     ]
   });
 
-  client.once('ready', (c) => {
+  let shuttingDown = false;
+  let inFlightCommands = 0;
+  let resolveIdle = null;
+  let shutdownPromise = null;
+  const trackCommand = async (work) => {
+    if (shuttingDown) return;
+    inFlightCommands += 1;
+    try {
+      await work();
+    } finally {
+      inFlightCommands -= 1;
+      if (inFlightCommands === 0) resolveIdle?.();
+    }
+  };
+  const waitForIdle = () => inFlightCommands === 0
+    ? Promise.resolve()
+    : new Promise(resolve => { resolveIdle = resolve; });
+  const shutdown = (signal) => {
+    if (shutdownPromise) return shutdownPromise;
+    shuttingDown = true;
+    shutdownPromise = (async () => {
+      console.log(`[INFO] Received ${signal}; shutting down Idelon gracefully...`);
+      try {
+        await waitForIdle();
+        client.destroy();
+        await gameService.shutdown?.();
+      } catch (err) {
+        console.error('[ERROR] Graceful shutdown failed:', err);
+        process.exitCode = 1;
+      }
+    })();
+    return shutdownPromise;
+  };
+
+  process.once('SIGINT', () => { void shutdown('SIGINT'); });
+  process.once('SIGTERM', () => { void shutdown('SIGTERM'); });
+
+  client.once('clientReady', (c) => {
     console.log(`=======================================================`);
     console.log(`🎮 Idelon Discord Bot Online!`);
     console.log(`🤖 Bot User: ${c.user.tag} (ID: ${c.user.id})`);
@@ -45,7 +83,56 @@ export async function launchBot() {
   });
 
   // Handle Slash Commands (/profile, /inv, /sell, etc.)
-  client.on('interactionCreate', async (interaction) => {
+  client.on('interactionCreate', (interaction) => trackCommand(async () => {
+    if (interaction.isButton() || interaction.isStringSelectMenu()) {
+      try {
+        const result = await botFrontend.handleComponentInteraction(interaction);
+        if (!result) {
+          await interaction.deferUpdate().catch(() => {});
+          return;
+        }
+
+        const cooldownMs = result.huntCooldownMs;
+        const embeds = result?.embeds || (result?.embed ? [result.embed] : null);
+        await interaction.update({
+          ...(embeds ? { embeds } : { content: 'Command executed successfully.' }),
+          components: result?.components || []
+        });
+
+        if (cooldownMs === HUNT_COOLDOWN_MS && interaction.message?.edit) {
+          const enabledComponents = setHuntButtonDisabled(result.components, false);
+          setTimeout(async () => {
+            try {
+              const message = typeof interaction.message.fetch === 'function'
+                ? await interaction.message.fetch()
+                : interaction.message;
+              if (!message?.components?.some(row => row.components?.some(component => (
+                component?.type === 2
+                && (component.custom_id || component.customId)?.startsWith('hunt:fight:')
+                && component.disabled === true
+              )))) {
+                return;
+              }
+              await message.edit({ components: enabledComponents });
+            } catch (err) {
+              console.error('[WARN] Could not re-enable Hunt button:', err);
+            }
+          }, cooldownMs);
+        }
+      } catch (err) {
+        console.error('[ERROR] Hunt component execution failed:', err);
+        await interaction.update({
+          embeds: [{
+            title: '❌ Hunt Error',
+            description: err.message || 'An unexpected error occurred.',
+            color: 0xE74C3C
+          }],
+          components: []
+        }).catch(() => {});
+      }
+      return;
+    }
+
     if (!interaction.isChatInputCommand()) return;
 
     try {
@@ -74,7 +161,7 @@ export async function launchBot() {
       const embeds = result?.embeds || (result?.embed ? [result.embed] : null);
 
       if (embeds) {
-        await interaction.editReply({ embeds });
+        await interaction.editReply({ embeds, components: result?.components || [] });
       } else {
         await interaction.editReply({ content: 'Command executed successfully.' });
       }
@@ -91,10 +178,10 @@ export async function launchBot() {
         await interaction.reply({ embeds: [errorEmbed], ephemeral: true }).catch(() => {});
       }
     }
-  });
+  }));
 
   // Handle Text Command Aliases (.profile, .inv, .sell, etc.)
-  client.on('messageCreate', async (message) => {
+  client.on('messageCreate', (message) => trackCommand(async () => {
     if (message.author.bot) return;
 
     const content = message.content.trim();
@@ -108,12 +195,12 @@ export async function launchBot() {
       const embeds = result?.embeds || (result?.embed ? [result.embed] : null);
 
       if (embeds) {
-        await message.reply({ embeds });
+        await message.reply({ embeds, components: result?.components || [] });
       }
     } catch (err) {
       console.error(`[ERROR] Execution error on text command alias '${content}':`, err);
     }
-  });
+  }));
 
   await client.login(token);
   return client;

@@ -3,14 +3,23 @@
  */
 export class InventoryModule {
   addItem(player, itemId, amount = 1) {
-    if (!player.inventory[itemId]) {
-      player.inventory[itemId] = 0;
+    if (!itemId || typeof amount !== 'number' || !Number.isSafeInteger(amount) || amount <= 0) {
+      return player.inventory[itemId] || 0;
     }
-    player.inventory[itemId] += amount;
+    const current = Number.isSafeInteger(player.inventory[itemId]) && player.inventory[itemId] >= 0
+      ? player.inventory[itemId]
+      : 0;
+    if (current > Number.MAX_SAFE_INTEGER - amount) {
+      return current;
+    }
+    player.inventory[itemId] = current + amount;
     return player.inventory[itemId];
   }
 
   removeItem(player, itemId, amount = 1) {
+    if (!itemId || typeof amount !== 'number' || !Number.isSafeInteger(amount) || amount <= 0) {
+      return false;
+    }
     if (!this.hasItem(player, itemId, amount)) {
       return false;
     }
@@ -22,7 +31,11 @@ export class InventoryModule {
   }
 
   hasItem(player, itemId, amount = 1) {
-    return (player.inventory[itemId] || 0) >= amount;
+    if (!itemId || typeof amount !== 'number' || !Number.isSafeInteger(amount) || amount <= 0) {
+      return false;
+    }
+    return Number.isSafeInteger(player.inventory[itemId])
+      && player.inventory[itemId] >= amount;
   }
 
   getInventory(player) {

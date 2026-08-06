@@ -32,6 +32,15 @@ export class DevService {
 
   async giveItem(adminId, targetPlayerId, itemId, amount = 1) {
     this.validateDev(adminId);
+    if (!itemId || typeof itemId !== 'string') {
+      return { success: false, reason: 'invalid_item_id', message: 'Item ID is required.' };
+    }
+    if (!this.gameService.engine.content.getItem(itemId)) {
+      return { success: false, reason: 'unknown_item', message: `Item '${itemId}' does not exist.` };
+    }
+    if (!Number.isInteger(amount) || amount <= 0) {
+      return { success: false, reason: 'invalid_quantity', message: 'Amount must be a positive integer.' };
+    }
     const player = await this.gameService.getPlayer(targetPlayerId);
     this.gameService.engine.inventory.addItem(player, itemId, amount);
     await this.gameService.savePlayer(player);
@@ -41,15 +50,27 @@ export class DevService {
 
   async removeItem(adminId, targetPlayerId, itemId, amount = 1) {
     this.validateDev(adminId);
+    if (!itemId || typeof itemId !== 'string') {
+      return { success: false, reason: 'invalid_item_id', message: 'Item ID is required.' };
+    }
+    if (!Number.isInteger(amount) || amount <= 0) {
+      return { success: false, reason: 'invalid_quantity', message: 'Amount must be a positive integer.' };
+    }
     const player = await this.gameService.getPlayer(targetPlayerId);
     const removed = this.gameService.engine.inventory.removeItem(player, itemId, amount);
     await this.gameService.savePlayer(player);
     this.logAction(adminId, 'remove-item', { targetPlayerId, itemId, amount, removed });
-    return { success: true, targetPlayerId, itemId, amount, removed };
+    return { success: removed, targetPlayerId, itemId, amount, removed, reason: removed ? undefined : 'insufficient_items' };
   }
 
   async addXP(adminId, targetPlayerId, skillId, xpAmount) {
     this.validateDev(adminId);
+    if (!skillId || !this.gameService.engine.content.getSkill(skillId)) {
+      return { success: false, reason: 'unknown_skill', message: `Skill '${skillId}' does not exist.` };
+    }
+    if (!Number.isInteger(xpAmount) || xpAmount <= 0) {
+      return { success: false, reason: 'invalid_xp', message: 'XP amount must be a positive integer.' };
+    }
     const player = await this.gameService.getPlayer(targetPlayerId);
     const result = this.gameService.engine.skills.addXP(player, skillId, xpAmount);
     await this.gameService.savePlayer(player);
@@ -59,6 +80,9 @@ export class DevService {
 
   async setLevel(adminId, targetPlayerId, newLevel) {
     this.validateDev(adminId);
+    if (!Number.isInteger(newLevel) || newLevel < 1) {
+      return { success: false, reason: 'invalid_level', message: 'Level must be a positive integer.' };
+    }
     const player = await this.gameService.getPlayer(targetPlayerId);
     player.level = Math.max(1, newLevel);
     player.heroXp = getXpForLevel(player.level);
@@ -69,8 +93,18 @@ export class DevService {
 
   async giveCurrency(adminId, targetPlayerId, currency, amount) {
     this.validateDev(adminId);
+    if (!['gold', 'sterlings'].includes(currency)) {
+      return { success: false, reason: 'unknown_currency', message: `Currency '${currency}' is not supported.` };
+    }
+    if (typeof amount !== 'number' || !Number.isFinite(amount) || amount <= 0 || amount > Number.MAX_SAFE_INTEGER) {
+      return { success: false, reason: 'invalid_amount', message: 'Amount must be positive.' };
+    }
     const player = await this.gameService.getPlayer(targetPlayerId);
-    this.gameService.engine.economy.addCurrency(player, currency, amount);
+    const before = player.currencies[currency] || 0;
+    const after = this.gameService.engine.economy.addCurrency(player, currency, amount);
+    if (after !== before + amount) {
+      return { success: false, reason: 'currency_limit', message: 'Currency balance cannot hold that amount.' };
+    }
     await this.gameService.savePlayer(player);
     this.logAction(adminId, 'give-currency', { targetPlayerId, currency, amount });
     return { success: true, targetPlayerId, currency, amount };
@@ -78,41 +112,24 @@ export class DevService {
 
   async teleport(adminId, targetPlayerId, areaId) {
     this.validateDev(adminId);
+    if (!this.gameService.engine.content.getArea(areaId)) {
+      return { success: false, reason: 'unknown_area', message: `Area '${areaId}' does not exist.` };
+    }
     const player = await this.gameService.getPlayer(targetPlayerId);
     player.currentAreaId = areaId;
+    if (!Array.isArray(player.visitedAreas)) player.visitedAreas = ['starter_village'];
+    if (!player.visitedAreas.includes(areaId)) player.visitedAreas.push(areaId);
     await this.gameService.savePlayer(player);
     this.logAction(adminId, 'teleport', { targetPlayerId, areaId });
     return { success: true, targetPlayerId, areaId };
   }
 
-  async completeQuest(adminId, targetPlayerId, questId) {
-    this.validateDev(adminId);
-    const player = await this.gameService.getPlayer(targetPlayerId);
-    if (!player.quests[questId]) {
-      player.quests[questId] = { id: questId, status: 'active', progress: 999, startedAt: Date.now() };
-    }
-    const questDef = this.gameService.engine.content.getQuest(questId);
-    if (questDef && questDef.objective) {
-      player.quests[questId].progress = questDef.objective.amount || 1;
-    }
-    const result = this.gameService.engine.quests.complete(player, questId);
-    await this.gameService.savePlayer(player);
-    this.logAction(adminId, 'complete-quest', { targetPlayerId, questId, result });
-    return { success: true, targetPlayerId, questId, result };
-  }
-
-  async resetQuest(adminId, targetPlayerId, questId) {
-    this.validateDev(adminId);
-    const player = await this.gameService.getPlayer(targetPlayerId);
-    delete player.quests[questId];
-    await this.gameService.savePlayer(player);
-    this.logAction(adminId, 'reset-quest', { targetPlayerId, questId });
-    return { success: true, targetPlayerId, questId };
-  }
-
   async spawnEnemy(adminId, targetPlayerId, enemyId) {
     this.validateDev(adminId);
-    const result = await this.gameService.fight(targetPlayerId, enemyId);
+    if (!enemyId || typeof enemyId !== 'string' || !this.gameService.engine.content.getEnemy(enemyId)) {
+      return { success: false, reason: 'unknown_enemy', message: `Enemy '${enemyId || ''}' does not exist.` };
+    }
+    const result = await this.gameService.hunt(targetPlayerId, enemyId);
     this.logAction(adminId, 'spawn-enemy', { targetPlayerId, enemyId, victory: result.victory });
     return result;
   }
@@ -123,6 +140,7 @@ export class DevService {
     if (player.currentActivity) {
       // Offset start time back by 1 hour
       player.currentActivity.lastClaimed -= 3600000;
+      await this.gameService.savePlayer(player);
     }
     const result = await this.gameService.claimActivity(targetPlayerId);
     this.logAction(adminId, 'force-activity-complete', { targetPlayerId, result });

@@ -10,8 +10,8 @@ const initialData = require('./data/initialData.json');
  * Creates and initializes a new headless Game Engine instance.
  * @returns {Promise<Engine>}
  */
-export async function createEngine() {
-  const engine = new Engine(initialData);
+export async function createEngine(options = {}) {
+  const engine = new Engine(initialData, options);
   await engine.init();
   return engine;
 }
@@ -20,16 +20,16 @@ export async function createEngine() {
  * Creates a new GameService facade initialized with the engine.
  * @returns {Promise<import('./service/gameService.js').GameService>}
  */
-export async function createGameInstance() {
-  const engine = await createEngine();
+export async function createGameInstance(options = {}) {
+  const engine = await createEngine(options);
   return createGameService(engine);
 }
 
 /**
  * Creates a Discord Bot client connected to GameService.
  */
-export async function createDiscordBotInstance() {
-  const gameService = await createGameInstance();
+export async function createDiscordBotInstance(options = {}) {
+  const gameService = await createGameInstance(options);
   return createDiscordBot(gameService);
 }
 
@@ -47,9 +47,9 @@ export * from './engine/combat/index.js';
 export * from './engine/equipment.js';
 export * from './engine/crafting.js';
 export * from './engine/economy.js';
-export * from './engine/quests.js';
 export * from './engine/world.js';
 export * from './engine/saveSystem.js';
 export * from './engine/rewards.js';
+export * from './engine/potions.js';
 export * from './engine/progression.js';
 export * from './database/adapter.js';

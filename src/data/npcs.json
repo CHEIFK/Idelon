@@ -1,30 +1,30 @@
 [
-  { "id": "blacksmith", "name": "Grimm the Smith", "areaId": "starter_village", "dialog": "Looking to forge sturdy iron weapons?", "questsProvided": ["craft_first_weapon"] },
-  { "id": "guide", "name": "Elder Guide", "areaId": "starter_village", "dialog": "Welcome adventurer! Speak to me for guidance and quests.", "questsProvided": ["first_steps", "slay_goblins"] },
-  { "id": "cook_marry", "name": "Chef Mary", "areaId": "starter_village", "dialog": "Nothing beats a hot meal after a long day!", "questsProvided": ["cook_shrimp_quest"] },
-  { "id": "fisherman_bob", "name": "Fisherman Bob", "areaId": "starter_village", "dialog": "The waters are brimming with fresh shrimp today.", "questsProvided": ["fish_shrimp_quest"] },
+  { "id": "blacksmith", "name": "Grimm the Smith", "areaId": "starter_village", "dialog": "Looking to forge sturdy iron weapons?" },
+  { "id": "guide", "name": "Elder Guide", "areaId": "starter_village", "dialog": "Welcome adventurer! Speak to me for guidance." },
+  { "id": "cook_marry", "name": "Chef Mary", "areaId": "starter_village", "dialog": "Nothing beats a hot meal after a long day!" },
+  { "id": "fisherman_bob", "name": "Fisherman Bob", "areaId": "starter_village", "dialog": "The waters are brimming with fresh shrimp today." },
 
-  { "id": "lumberjack_paul", "name": "Lumberjack Paul", "areaId": "whispering_woods", "dialog": "Watch out for wolves among these oak and birch trees.", "questsProvided": ["chop_birch_quest"] },
-  { "id": "hunter_trapper", "name": "Trapper Tom", "areaId": "whispering_woods", "dialog": "Wild beasts roam these woods day and night.", "questsProvided": ["hunt_wolves_quest"] },
+  { "id": "lumberjack_paul", "name": "Lumberjack Paul", "areaId": "whispering_woods", "dialog": "Watch out for wolves among these oak and birch trees." },
+  { "id": "hunter_trapper", "name": "Trapper Tom", "areaId": "whispering_woods", "dialog": "Wild beasts roam these woods day and night." },
 
-  { "id": "mine_master", "name": "Foreman Flint", "areaId": "iron_mines", "dialog": "Iron is the backbone of any true warrior's armor.", "questsProvided": ["mine_iron_quest"] },
-  { "id": "geologist_stone", "name": "Geologist Stone", "areaId": "iron_mines", "dialog": "Deep veins of silver lie hidden beneath the mountain.", "questsProvided": ["mine_silver_quest"] },
+  { "id": "mine_master", "name": "Foreman Flint", "areaId": "iron_mines", "dialog": "Iron is the backbone of any true warrior's armor." },
+  { "id": "geologist_stone", "name": "Geologist Stone", "areaId": "iron_mines", "dialog": "Deep veins of silver lie hidden beneath the mountain." },
 
-  { "id": "hermit_sage", "name": "Hermit Sage", "areaId": "misty_mountains", "dialog": "Only the strong survive the cold mountain winds.", "questsProvided": ["defeat_golems_quest"] },
-  { "id": "alchemist_hazel", "name": "Alchemist Hazel", "areaId": "misty_mountains", "dialog": "Rare herbs and minerals produce potent concoctions.", "questsProvided": ["gather_silver_quest"] },
+  { "id": "hermit_sage", "name": "Hermit Sage", "areaId": "misty_mountains", "dialog": "Only the strong survive the cold mountain winds." },
+  { "id": "alchemist_hazel", "name": "Alchemist Hazel", "areaId": "misty_mountains", "dialog": "Rare herbs and minerals produce potent concoctions." },
 
-  { "id": "bandit_informant", "name": "Sly Jack", "areaId": "bandit_outpost", "dialog": "Shh! Keep your voice down around the chief.", "questsProvided": ["defeat_bandits_quest"] },
-  { "id": "captain_valiant", "name": "Captain Valiant", "areaId": "bandit_outpost", "dialog": "We must rid these roads of lawless highwaymen!", "questsProvided": ["defeat_bandit_chief_quest"] },
+  { "id": "bandit_informant", "name": "Sly Jack", "areaId": "bandit_outpost", "dialog": "Shh! Keep your voice down around the chief." },
+  { "id": "captain_valiant", "name": "Captain Valiant", "areaId": "bandit_outpost", "dialog": "We must rid these roads of lawless highwaymen!" },
 
-  { "id": "high_priest", "name": "High Priest Elion", "areaId": "sunken_ruins", "dialog": "Ancient spirits rest uneasy within these crypts.", "questsProvided": ["cleanse_skeletons_quest"] },
-  { "id": "crypt_keeper", "name": "Crypt Keeper Malakor", "areaId": "sunken_ruins", "dialog": "Turn back before the darkness consumes you.", "questsProvided": ["defeat_wraiths_quest"] },
+  { "id": "high_priest", "name": "High Priest Elion", "areaId": "sunken_ruins", "dialog": "Ancient spirits rest uneasy within these crypts." },
+  { "id": "crypt_keeper", "name": "Crypt Keeper Malakor", "areaId": "sunken_ruins", "dialog": "Turn back before the darkness consumes you." },
 
-  { "id": "dragon_slayer_vort", "name": "Vort the Dragonslayer", "areaId": "dragon_spire", "dialog": "Fire drakes nest atop this glowing peak.", "questsProvided": ["slay_drakes_quest"] },
-  { "id": "dragon_priestess", "name": "Priestess Ignis", "areaId": "dragon_spire", "dialog": "Respect the ancient flame of the dragons.", "questsProvided": ["gather_scales_quest"] },
+  { "id": "dragon_slayer_vort", "name": "Vort the Dragonslayer", "areaId": "dragon_spire", "dialog": "Fire drakes nest atop this glowing peak." },
+  { "id": "dragon_priestess", "name": "Priestess Ignis", "areaId": "dragon_spire", "dialog": "Respect the ancient flame of the dragons." },
 
-  { "id": "shadow_monk", "name": "Monk Umbra", "areaId": "shadow_abyss", "dialog": "Embrace the quiet eternal darkness.", "questsProvided": ["defeat_shadow_beast_quest"] },
-  { "id": "wanderer_kael", "name": "Wanderer Kael", "areaId": "shadow_abyss", "dialog": "I have sought the abyssal core for decades.", "questsProvided": ["gather_relics_quest"] },
+  { "id": "shadow_monk", "name": "Monk Umbra", "areaId": "shadow_abyss", "dialog": "Embrace the quiet eternal darkness." },
+  { "id": "wanderer_kael", "name": "Wanderer Kael", "areaId": "shadow_abyss", "dialog": "I have sought the abyssal core for decades." },
 
-  { "id": "celestial_guardian", "name": "Guardian Aurelius", "areaId": "celestial_sanctuary", "dialog": "Only champions may set foot upon celestial ground.", "questsProvided": ["slay_demons_quest"] },
-  { "id": "elder_archmage", "name": "Archmage Aethelgard", "areaId": "celestial_sanctuary", "dialog": "You have reached the pinnacle of mortal power.", "questsProvided": ["slay_overlord_quest"] }
+  { "id": "celestial_guardian", "name": "Guardian Aurelius", "areaId": "celestial_sanctuary", "dialog": "Only champions may set foot upon celestial ground." },
+  { "id": "elder_archmage", "name": "Archmage Aethelgard", "areaId": "celestial_sanctuary", "dialog": "You have reached the pinnacle of mortal power." }
 ]

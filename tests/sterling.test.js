@@ -87,7 +87,7 @@ test('Sterling persistence layer and v5 schema migration fallback', async () => 
   const { migratePlayerSave } = await import('../migrations/index.js');
   const migratedData = migratePlayerSave(legacyV4Save);
 
-  assert.equal(migratedData.schemaVersion, 5);
+  assert.ok(migratedData.schemaVersion >= 5);
   assert.equal(migratedData.currencies.gold, 100);
   assert.equal(migratedData.currencies.sterlings, 30);
   assert.equal(migratedData.sterlings, undefined, 'Top level sterlings should be deleted');

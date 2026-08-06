@@ -68,6 +68,20 @@ test('.sell all / sellItem(playerId, "all") sells ONLY ores and preserves non-or
   assert.equal(inv['wood_log'], 10);
 });
 
+test('Bulk selling rejects a supplied quantity instead of silently selling all ores', async () => {
+  const game = await createGameInstance();
+  const playerId = 'usr_bulk_quantity_guard';
+  await game.start(playerId, 'Bulk Guard');
+  const player = await game.getPlayer(playerId);
+  game.engine.inventory.addItem(player, 'copper_ore', 10);
+  await game.savePlayer(player);
+
+  const result = await game.sellItem(playerId, 'all', 0);
+  assert.equal(result.success, false);
+  assert.equal(result.reason, 'invalid_quantity');
+  assert.equal((await game.getInventory(playerId)).copper_ore, 10);
+});
+
 test('Item name normalization & case-insensitive matching for selling', async () => {
   const game = await createGameInstance();
   const playerId = 'usr_econ_2';

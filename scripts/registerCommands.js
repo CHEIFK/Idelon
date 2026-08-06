@@ -78,7 +78,7 @@ function formatCommandData(cmd) {
         description: 'Give currency',
         type: 1,
         options: [
-          { name: 'currency', description: 'Currency (gold/gems)', type: OPTION_TYPES.STRING, required: true },
+          { name: 'currency', description: 'Currency (gold/sterlings)', type: OPTION_TYPES.STRING, required: true },
           { name: 'amount', description: 'Amount', type: OPTION_TYPES.INTEGER, required: true },
           { name: 'target_user', description: 'Target Player ID', type: OPTION_TYPES.STRING, required: false }
         ]
@@ -89,24 +89,6 @@ function formatCommandData(cmd) {
         type: 1,
         options: [
           { name: 'area', description: 'Area ID', type: OPTION_TYPES.STRING, required: true },
-          { name: 'target_user', description: 'Target Player ID', type: OPTION_TYPES.STRING, required: false }
-        ]
-      },
-      {
-        name: 'complete-quest',
-        description: 'Complete quest for player',
-        type: 1,
-        options: [
-          { name: 'quest', description: 'Quest ID', type: OPTION_TYPES.STRING, required: true },
-          { name: 'target_user', description: 'Target Player ID', type: OPTION_TYPES.STRING, required: false }
-        ]
-      },
-      {
-        name: 'reset-quest',
-        description: 'Reset quest for player',
-        type: 1,
-        options: [
-          { name: 'quest', description: 'Quest ID', type: OPTION_TYPES.STRING, required: true },
           { name: 'target_user', description: 'Target Player ID', type: OPTION_TYPES.STRING, required: false }
         ]
       },
@@ -144,7 +126,7 @@ function formatCommandData(cmd) {
   } else if (Array.isArray(cmd.options)) {
     data.options = cmd.options.map(opt => ({
       name: opt.name,
-      description: opt.name,
+      description: opt.description || `Specify ${opt.name}`,
       type: OPTION_TYPES[opt.type] || 3,
       required: !!opt.required
     }));

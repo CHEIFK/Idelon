@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createGameInstance, ACTIVITIES } from '../src/index.js';
+import { getXpForLevel } from '../src/engine/progression.js';
 
 test('GameService high-level public API orchestration pipeline', async () => {
   const game = await createGameInstance();
@@ -23,32 +24,23 @@ test('GameService high-level public API orchestration pipeline', async () => {
   const claimRes = await game.claimActivity(playerId);
   assert.ok(claimRes);
 
-  // 4. Talk to NPC & Quest Acceptance
+  // 4. Talk to NPC
   const talkRes = await game.talkToNpc(playerId, 'guide');
   assert.equal(talkRes.npc.id, 'guide');
 
-  const acceptRes = await game.acceptQuest(playerId, 'first_steps');
-  assert.equal(acceptRes.success, true);
-
-  // 5. Add required items for quest completion and save
-  const player = await game.getPlayer(playerId);
-  game.engine.inventory.addItem(player, 'iron_ore', 3);
-  game.engine.quests.update(player, 'inventory:itemAdded', { playerId, itemId: 'iron_ore', amount: 3 });
-  await game.savePlayer(player);
-
-  // 6. Fight Enemy
+  // 5. Fight Enemy
   const fightRes = await game.fight(playerId, 'goblin');
   assert.equal(fightRes.success, true);
   assert.equal(fightRes.victory, true);
 
-  // 7. Complete Quest & Travel
-  const completeRes = await game.completeQuest(playerId, 'first_steps');
-  assert.equal(completeRes.success, true);
-
+  // 6. Travel
+  const traveler = await game.getPlayer(playerId);
+  traveler.heroXp = getXpForLevel(40);
+  await game.savePlayer(traveler);
   const travelRes = await game.travel(playerId, 'iron_mines');
   assert.equal(travelRes.success, true);
 
-  // 8. Getters verification
+  // 7. Getters verification
   const inventory = await game.getInventory(playerId);
   assert.ok(typeof inventory === 'object');
 
@@ -57,7 +49,4 @@ test('GameService high-level public API orchestration pipeline', async () => {
 
   const skills = await game.getSkills(playerId);
   assert.ok(typeof skills === 'object');
-
-  const questLog = await game.getQuestLog(playerId);
-  assert.ok(questLog['first_steps']);
 });

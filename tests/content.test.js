@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createEngine, ContentLoader } from '../src/index.js';
 
-test('Content system loads and queries all 11 definitions', async () => {
+test('Content system loads and queries all 10 definitions', async () => {
   const engine = await createEngine();
   const content = engine.content;
 
@@ -15,10 +15,9 @@ test('Content system loads and queries all 11 definitions', async () => {
   assert.ok(content.getRecipe('craft_iron_sword'), 'Recipe craft_iron_sword loaded');
   assert.ok(content.getNpc('blacksmith'), 'NPC blacksmith loaded');
   assert.ok(content.getArea('starter_village'), 'Area starter_village loaded');
-  assert.ok(content.getQuest('first_steps'), 'Quest first_steps loaded');
   assert.ok(content.getLootTable('mining_iron_loot'), 'LootTable mining_iron_loot loaded');
 
-  assert.equal(content.getAll('items').length, 72);
+  assert.equal(content.getAll('items').length, 150);
   assert.equal(content.getAll('skills').length, 8);
 });
 
@@ -44,4 +43,14 @@ test('Content validation catches duplicate IDs', () => {
       { id: 'dup_item', name: 'Item 2' }
     ]);
   }, /Duplicate ID 'dup_item'/);
+});
+
+test('Equipment metadata has one canonical gameplay definition', async () => {
+  const engine = await createEngine();
+  const equipment = engine.content.getEquipment('diamond_ring');
+  const item = engine.content.getItem('diamond_ring');
+
+  assert.equal(item.requiredLevel, equipment.levelReq);
+  assert.deepEqual(item.statBonuses, equipment.stats);
+  assert.equal(item.equipmentSlot, equipment.slot);
 });

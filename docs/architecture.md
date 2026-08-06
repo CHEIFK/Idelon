@@ -18,7 +18,7 @@ This engine is designed as a **completely UI-agnostic, headless game core**. It 
   |        |         |        |         |        |         |
   v        v         v        v         v        v         v
 Player Inventory Skills Activities  Combat Equipment Crafting
-Economy Quests   World  SaveSystem Rewards Events    Constants
+Economy          World  SaveSystem Rewards Events    Constants
 +-------------------------------------------------------------+
                               |
                               v
@@ -48,7 +48,7 @@ Split into dedicated sub-files per activity type:
 Centralized string maps (e.g. `ACTIVITIES.MINING_IRON`, `EVENTS.PLAYER_LEVEL_UP`) to eliminate magic strings across the engine and frontends.
 
 ### 4. Engine Events (`src/events/`)
-Uses native Node.js `EventEmitter` to broadcast events (`PLAYER_LEVEL_UP`, `ITEM_OBTAINED`, `QUEST_COMPLETED`, `PLAYER_DIED`) without coupling engine code to frontend handlers.
+Uses native Node.js `EventEmitter` to broadcast events (`PLAYER_LEVEL_UP`, `ITEM_OBTAINED`, `PLAYER_DIED`) without coupling engine code to frontend handlers.
 
 ### 5. Type Definitions (`src/types/`)
 JSDoc typedef schemas (`PlayerState`, `ActivityState`, `ItemDefinition`) for IDE autocompletion and static type safety.

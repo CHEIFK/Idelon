@@ -79,7 +79,8 @@ test('5. Sector Exploration Gating for Mining (Lead, Sand, Titanium)', async () 
 
   // Travel to Sector 2 (Lead Quarry) -> Lead unlocked!
   const p1 = await game.getPlayer(playerId);
-  p1.heroXp = 100; // level 2
+  p1.heroXp = 1100; // Hero level 5
+  p1.skills.mining = { level: 2, xp: 200 }; // Lead resource skill requirement
   await game.savePlayer(p1);
   await game.travel(playerId, 'lead_quarry');
 
@@ -90,7 +91,8 @@ test('5. Sector Exploration Gating for Mining (Lead, Sand, Titanium)', async () 
 
   // Travel to Sector 3 (Sand Dunes) -> Sand unlocked!
   const p2 = await game.getPlayer(playerId);
-  p2.heroXp = 300; // level 3
+  p2.heroXp = 4600; // Hero level 10
+  p2.skills.mining = { level: 3, xp: 300 }; // Sand resource skill requirement
   await game.savePlayer(p2);
   await game.travel(playerId, 'sand_dunes');
 
@@ -101,7 +103,8 @@ test('5. Sector Exploration Gating for Mining (Lead, Sand, Titanium)', async () 
 
   // Travel to Sector 4 (Titanium Caverns) -> Titanium unlocked!
   const p3 = await game.getPlayer(playerId);
-  p3.heroXp = 1100; // level 5 threshold
+  p3.heroXp = 10600; // Hero level 15 threshold
+  p3.skills.mining = { level: 5, xp: 1100 }; // Titanium resource skill requirement
   await game.savePlayer(p3);
   await game.travel(playerId, 'titanium_caverns');
 

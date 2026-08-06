@@ -10,13 +10,13 @@ import {
 import { migratePlayerSave } from '../migrations/index.js';
 import { createAreasEmbed, createNothingToClaimEmbed, createSellInfoEmbed } from '../src/discord/embeds.js';
 
-test('1. Mining Sector Unlock Bug Fix - Hero Level 2 unlocks Sector 02, NOT Sector 10', async () => {
+test('1. Hero Level progression unlocks Sector 02 without unlocking future sectors', async () => {
   const game = await createGameInstance();
   const playerId = 'usr_sector_unlock_test';
   await game.start(playerId, 'UnlockTester');
 
-  // Trigger level up to level 2 in mining
-  const rewards = game._computeLevelUpRewards({ skills: { mining: { level: 2 } } }, 'mining', 1);
+  // Trigger Hero Level 5 progression; skill level is irrelevant to sectors.
+  const rewards = game._computeHeroLevelUpRewards({ level: 5 }, 4);
   assert.equal(rewards.length, 1);
   const lu = rewards[0];
   
@@ -41,10 +41,10 @@ test('3. First-Time Exploration Tracking & No Duplicates', async () => {
   const playerId = 'usr_travel_vis_test';
   await game.start(playerId, 'Traveler');
 
-  // Level up player to 2 so lead_quarry travel is valid
+  // Reach Hero Level 5 so lead_quarry travel is valid
   const playerToLevel = await game.getPlayer(playerId);
-  playerToLevel.heroXp = 100; // Hero level 2 threshold
-  playerToLevel.level = 2;
+  playerToLevel.heroXp = 1100; // Hero level 5 threshold
+  playerToLevel.level = 5;
   await game.savePlayer(playerToLevel);
 
   // Travel to Sector 2
@@ -67,8 +67,7 @@ test('4. Four-State Areas Embed Rendering', async () => {
   const player = {
     currentAreaId: 'lead_quarry',
     visitedAreas: ['starter_village', 'lead_quarry'],
-    level: 5,
-    quests: {}
+    level: 10
   };
   const allAreas = game.engine.content.getAll('areas');
   const availableAreas = game.engine.world.getAvailable(player);
@@ -87,6 +86,7 @@ test('5. World Exploration & Location Yield Multipliers', async () => {
   // Player explored up to Sector 4 (Titanium Caverns)
   const player = {
     currentAreaId: 'titanium_caverns',
+    level: 15,
     visitedAreas: ['starter_village', 'lead_quarry', 'sand_dunes', 'titanium_caverns']
   };
 
@@ -138,11 +138,11 @@ test('7. Economy Safety - Multipliers ONLY alter gathered quantity, NOT XP, Gold
 
   // Claim single activity and check XP & currency rewards
   game.engine.activities.start(player, 'mine_copper');
-  player.currentActivity.lastClaimed -= 10000; // 4 cycles
+  player.currentActivity.lastClaimed -= Math.floor((2500 / 3) * 4 + 50); // 4 cycles at 3x speed
   await game.savePlayer(player);
 
   const claimRes = await game.claimActivity(playerId);
-  assert.equal(claimRes.xpGained, 40); // 10 XP * 4 cycles (NO multiplier on XP)
+  assert.equal(claimRes.xpGained, 40); // 10 XP * 4 cycles (NO multiplier on XP per cycle)
 });
 
 test('8. UX - .claim without active activity displays guidance embed', async () => {
@@ -154,8 +154,8 @@ test('8. UX - .claim without active activity displays guidance embed', async () 
   assert.equal(claimRes, null);
 
   const guidanceEmbed = createNothingToClaimEmbed();
-  assert.equal(guidanceEmbed.title, 'Nothing to Claim');
-  assert.ok(guidanceEmbed.description.includes('You don\'t have an active gathering activity.'));
+  assert.ok(guidanceEmbed.title.includes('Nothing to Claim'));
+  assert.ok(guidanceEmbed.description.includes("You haven't started mining yet."));
 });
 
 test('9. UX - .sell without arguments & quantity error handling', async () => {

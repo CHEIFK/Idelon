@@ -3,10 +3,10 @@
  * Abbreviates large numbers using standard metric/gaming notation (K, M, B, T, Q, S).
  */
 export function formatNumber(num) {
-  if (num === null || num === undefined || Number.isNaN(num)) return '0';
+  if (num === null || num === undefined || (typeof num === 'number' && !Number.isFinite(num))) return '0';
 
   let n = typeof num === 'number' ? num : parseFloat(num);
-  if (Number.isNaN(n)) return String(num);
+  if (!Number.isFinite(n)) return '0';
 
   const abs = Math.abs(n);
   if (abs < 1000) {

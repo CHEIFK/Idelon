@@ -28,6 +28,11 @@ export class EquipmentModule {
       return { success: false, reason: 'not_equipable' };
     }
 
+    const playerLevel = Number.isInteger(player?.level) && player.level > 0 ? player.level : 1;
+    if (itemDef.levelReq && playerLevel < itemDef.levelReq) {
+      return { success: false, reason: 'level_too_low', requiredLevel: itemDef.levelReq };
+    }
+
     const slot = itemDef.slot;
     if (EQUIPMENT_SLOTS.length > 0 && !EQUIPMENT_SLOTS.includes(slot) && slot !== 'mainHand' && slot !== 'offHand') {
       return { success: false, reason: 'invalid_slot', slot };
@@ -39,6 +44,10 @@ export class EquipmentModule {
 
     if (!hasItem) {
       return { success: false, reason: 'item_not_in_inventory' };
+    }
+
+    if (player.equipment[slot]?.id === itemDef.id) {
+      return { success: false, reason: 'already_equipped', slot, equipped: player.equipment[slot] };
     }
 
     // Handle swapping out existing item in slot
@@ -66,7 +75,9 @@ export class EquipmentModule {
       id: itemDef.id,
       name: itemDef.name,
       slot: itemDef.slot,
-      stats: { ...(itemDef.stats || {}) }
+      stats: { ...(itemDef.stats || {}) },
+      durability: itemDef.maxDurability || 100,
+      maxDurability: itemDef.maxDurability || 100
     };
 
     if (eventsBus) {
@@ -140,7 +151,7 @@ export class EquipmentModule {
     for (const slotItem of Object.values(player.equipment || {})) {
       if (slotItem && slotItem.stats) {
         for (const [statKey, statValue] of Object.entries(slotItem.stats)) {
-          if (typeof statValue === 'number') {
+          if (typeof statValue === 'number' && Number.isFinite(statValue)) {
             totals[statKey] = (totals[statKey] || 0) + statValue;
           }
         }
@@ -148,5 +159,109 @@ export class EquipmentModule {
     }
 
     return totals;
+  }
+
+  reduceDurability(player, amount, contentLoader, inventoryModule, eventsBus) {
+    const changes = { broken: [], reduced: [], replacements: [] };
+    if (!player.equipment || typeof amount !== 'number' || !Number.isFinite(amount) || amount <= 0) return changes;
+
+    for (const slot of Object.keys(player.equipment)) {
+      const item = player.equipment[slot];
+      if (!item) continue;
+
+      if (item.durability === undefined) {
+        const itemDef = contentLoader ? contentLoader.getEquipment(item.id) : null;
+        const maxDurability = itemDef?.maxDurability || 100;
+        item.durability = maxDurability;
+        item.maxDurability = maxDurability;
+      }
+
+      item.durability -= amount;
+      if (item.durability <= 0) {
+        changes.broken.push({ slot, itemId: item.id, itemName: item.name });
+        delete player.equipment[slot];
+
+        if (eventsBus) {
+          eventsBus.emit(EVENTS.EQUIPMENT_UNEQUIPPED, {
+            playerId: player.id,
+            itemId: item.id,
+            slot
+          });
+        }
+
+        const bestReplacementId = this._findBestForSlot(player, slot, contentLoader, player.level || 1);
+        if (bestReplacementId) {
+          const equipRes = this.equip(player, bestReplacementId, contentLoader, inventoryModule, eventsBus);
+          if (equipRes.success) {
+            changes.replacements.push({ slot, newItemId: bestReplacementId, newItemName: equipRes.equipped.name });
+          }
+        }
+      } else {
+        changes.reduced.push({ slot, itemId: item.id, remaining: item.durability, max: item.maxDurability });
+      }
+    }
+
+    return changes;
+  }
+
+  autoEquipBest(player, contentLoader, inventoryModule, eventsBus) {
+    const changes = { equipped: [] };
+    if (!player.inventory || !contentLoader) return changes;
+
+    const slots = EQUIPMENT_SLOTS.length > 0 ? EQUIPMENT_SLOTS : ['weapon', 'helmet', 'chest', 'legs', 'boots', 'gloves', 'ring', 'amulet', 'shield'];
+    const playerLevel = player.level || 1;
+
+    for (const slot of slots) {
+      const bestId = this._findBestForSlot(player, slot, contentLoader, playerLevel);
+      if (!bestId) continue;
+
+      const currentItem = player.equipment[slot];
+      const bestDef = contentLoader.getEquipment(bestId);
+
+      let shouldEquip = false;
+      if (!currentItem) {
+        shouldEquip = true;
+      } else {
+        const currentDef = contentLoader.getEquipment(currentItem.id);
+        const currentStats = (currentDef?.stats?.attack || 0) + (currentDef?.stats?.defense || 0) + (currentDef?.stats?.health || 0);
+        const bestStats = (bestDef?.stats?.attack || 0) + (bestDef?.stats?.defense || 0) + (bestDef?.stats?.health || 0);
+        if (bestStats > currentStats) {
+          shouldEquip = true;
+        }
+      }
+
+      if (shouldEquip) {
+        const oldItem = currentItem ? { id: currentItem.id, name: currentItem.name } : null;
+        const equipRes = this.equip(player, bestId, contentLoader, inventoryModule, eventsBus);
+        if (equipRes.success) {
+          changes.equipped.push({ slot, newItem: { id: bestId, name: bestDef.name }, oldItem });
+        }
+      }
+    }
+
+    return changes;
+  }
+
+  _findBestForSlot(player, slot, contentLoader, playerLevel) {
+    if (!player.inventory || !contentLoader) return null;
+
+    let bestId = null;
+    let maxStats = -1;
+
+    for (const [itemId, qty] of Object.entries(player.inventory)) {
+      if (qty < 1) continue;
+
+      const itemDef = contentLoader.getEquipment(itemId);
+      if (!itemDef || itemDef.slot !== slot) continue;
+      if (itemDef.levelReq && playerLevel < itemDef.levelReq) continue;
+
+      const totalStats = (itemDef.stats?.attack || 0) + (itemDef.stats?.defense || 0) + (itemDef.stats?.health || 0);
+      if (totalStats > maxStats) {
+        maxStats = totalStats;
+        bestId = itemId;
+      }
+    }
+
+    return bestId;
   }
 }

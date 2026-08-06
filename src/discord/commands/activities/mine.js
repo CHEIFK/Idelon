@@ -1,4 +1,4 @@
-import { createActivityResultEmbed, createAutoMineStartEmbed, createErrorEmbed, createResourceLockedEmbed } from '../../embeds.js';
+import { createActivityResultEmbed, createAutoMineStartEmbed, createAlreadyMiningEmbed, createErrorEmbed, createResourceLockedEmbed } from '../../embeds.js';
 
 const MINING_ACTIVITY_MAP = {
   copper: 'mine_copper',
@@ -29,7 +29,7 @@ export default {
   name: 'mine',
   category: 'activities',
   description: 'Start a mining activity. Omit resource to auto-mine all unlocked ores.',
-  options: [{ name: 'activity', type: 'STRING', required: false }],
+  options: [{ name: 'activity', description: 'Ore to focus on; omit to mine all unlocked ores', type: 'STRING', required: false }],
   async execute(interaction, gameService) {
     try {
       const rawInput = interaction.options?.getString('activity');
@@ -39,6 +39,10 @@ export default {
         const clean = rawInput.trim().toLowerCase().replace(/\s+/g, '_');
         const activityId = MINING_ACTIVITY_MAP[clean] || (clean.startsWith('mine_') ? clean : `mine_${clean}`);
         const result = await gameService.mine(interaction.user.id, activityId);
+
+        if (result && result.alreadyActive) {
+          return { embed: createAlreadyMiningEmbed(result.skillId || 'mining') };
+        }
 
         if (result && result.success === false && result.reason === 'sector_locked') {
           return { embed: createResourceLockedEmbed(result.owningAreaId, gameService.engine.content) };
@@ -50,6 +54,11 @@ export default {
 
       // ── Auto mode: mine all unlocked ores ──────────────────────────────
       const result = await gameService.mineAuto(interaction.user.id);
+
+      if (result && result.alreadyActive) {
+        return { embed: createAlreadyMiningEmbed('mining') };
+      }
+
       const resEmbed = createAutoMineStartEmbed(result, gameService.engine.content);
       return { embed: resEmbed };
     } catch (err) {

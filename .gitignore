@@ -3,3 +3,7 @@ node_modules/
 *.log
 .DS_Store
 dist/
+.aider*
+data/idelon.sqlite
+data/idelon.sqlite-shm
+data/idelon.sqlite-wal

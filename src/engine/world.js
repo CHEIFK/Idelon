@@ -1,4 +1,6 @@
 import { EVENTS } from '../constants/index.js';
+import { syncPlayerUnlockedAreas } from './player.js';
+import { getUnlockedAreaIdsForHeroLevel } from '../utils/sectorMap.js';
 
 /**
  * NPC sub-module managing NPC interactions and dialogue.
@@ -20,6 +22,9 @@ export class NpcModule {
   talk(player, npcId, contentLoader = this.engine?.content, eventsBus = this.engine?.events) {
     const npc = this.get(npcId, contentLoader);
     if (!npc) return null;
+    if (npc.areaId && npc.areaId !== (player?.currentAreaId || 'starter_village')) {
+      return { success: false, reason: 'npc_not_in_area', npc };
+    }
 
     if (eventsBus) {
       eventsBus.emit(EVENTS.NPC_TALKED, {
@@ -30,9 +35,9 @@ export class NpcModule {
     }
 
     return {
+      success: true,
       npc,
-      dialog: npc.dialog,
-      questsProvided: npc.questsProvided || []
+      dialog: npc.dialog
     };
   }
 }
@@ -56,30 +61,28 @@ export class WorldModule {
     return contentLoader.getArea(areaId);
   }
 
-  getNpc(npcId, contentLoader = this.engine?.content) {
+  getNpc(npcId, contentLoader = this.content || this.engine?.content) {
     return this.npc.get(npcId, contentLoader);
   }
 
   /**
    * Return areas available / unlocked for the player.
    */
-  getAvailable(player, contentLoader = this.engine?.content) {
+  getAvailable(player, contentLoader = this.content || this.engine?.content) {
     if (!contentLoader) return [];
+    syncPlayerUnlockedAreas(player);
     const allAreas = contentLoader.getAll('areas');
+    const unlockedSet = new Set(getUnlockedAreaIdsForHeroLevel(player?.level));
 
     return allAreas.filter(area => {
-      const levelOk = (player.level || 1) >= (area.levelReq || 1);
-      const questOk = !area.reqQuestId || (player.quests[area.reqQuestId]?.status === 'completed');
-      const manuallyUnlocked = Array.isArray(player.unlockedAreas) && player.unlockedAreas.includes(area.id);
-
-      return levelOk && (questOk || manuallyUnlocked);
+      return unlockedSet.has(area.id);
     });
   }
 
   /**
    * Travel player to specified area.
    */
-  travel(player, areaId, contentLoader = this.engine?.content, eventsBus = this.engine?.events) {
+  travel(player, areaId, contentLoader = this.content || this.engine?.content, eventsBus = this.events || this.engine?.events) {
     const available = this.getAvailable(player, contentLoader);
     const targetArea = available.find(a => a.id === areaId);
 

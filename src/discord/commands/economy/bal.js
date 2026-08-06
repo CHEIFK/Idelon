@@ -7,7 +7,7 @@ export default {
   async execute(interaction, gameService) {
     try {
       const balance = await gameService.getBalance(interaction.user.id);
-      return { embed: createBalanceEmbed(balance, interaction.user.username) };
+      return { embed: createBalanceEmbed(balance, interaction.user.username, gameService.engine.content) };
     } catch (err) {
       return { embed: createErrorEmbed('Balance Error', err.message) };
     }

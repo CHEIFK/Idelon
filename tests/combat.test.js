@@ -53,7 +53,7 @@ test('Combat respawn: fights against the same enemy reset enemy HP per encounter
   assert.equal(res2.enemyFinalHp, 0);
 });
 
-test('Level requirement check prevents engaging high-level enemies', async () => {
+test('Engaging high-level enemies evaluates stat-driven combat outcome', async () => {
   const engine = await createEngine();
   const player = engine.player.create('usr_novice_warrior', 'Rookie');
 
@@ -62,12 +62,71 @@ test('Level requirement check prevents engaging high-level enemies', async () =>
     id: 'dragon_boss',
     name: 'Ancient Dragon',
     level: 50,
-    levelReq: 50,
     hp: 2000,
     attack: 100
   });
 
   const res = engine.combat.start(player, 'dragon_boss');
-  assert.equal(res.success, false);
-  assert.equal(res.reason, 'level_too_low');
+  assert.equal(res.success, true);
+  assert.equal(res.playerDied, true, 'Low level player engaging ancient dragon is defeated by stats');
+});
+
+test('Combat damageDealt reports the sum of player attacks, including a first missed attack', async () => {
+  const engine = await createEngine();
+  const player = engine.player.create('usr_damage_total', 'DamageTracker');
+  const originalRandom = Math.random;
+  let calls = 0;
+  Math.random = () => {
+    calls += 1;
+    return calls === 1 ? 1 : 0;
+  };
+  try {
+    const result = engine.combat.start(player, 'goblin');
+    const totalPlayerDamage = result.turns
+      .filter(turn => turn.attacker === 'player')
+      .reduce((sum, turn) => sum + turn.damageDealt, 0);
+    assert.equal(result.damageDealt, totalPlayerDamage);
+    assert.equal(result.turns[0].damageDealt, 0);
+  } finally {
+    Math.random = originalRandom;
+  }
+});
+
+test('Combat loot honors fixed data-driven entry amounts before scaling', async () => {
+  const engine = await createEngine();
+  const enemy = { id: 'amount_enemy', lootTableId: 'amount_loot', hp: 1, attack: 1, defense: 0 };
+  engine.content.categories.enemies.set(enemy.id, enemy);
+  engine.content.categories.lootTables.set('amount_loot', {
+    id: 'amount_loot',
+    entries: [{ itemId: 'bone_fragment', amount: 2, chance: 1 }]
+  });
+  const originalRandom = Math.random;
+  Math.random = () => 0;
+  try {
+    const drops = (await import('../src/engine/combat/loot.js')).generateCombatLoot(enemy, engine.content);
+    assert.equal(drops[0].amount, 20, 'Amount 2 should scale from a 10-unit minimum');
+  } finally {
+    Math.random = originalRandom;
+  }
+});
+
+test('Boss lookup is data-backed and boss victories emit the boss event', async () => {
+  const engine = await createEngine();
+  const player = engine.player.create('usr_boss_data', 'Boss Hunter');
+  player.level = 100;
+  player.equipment.weapon = { id: 'iron_sword', stats: { attack: 10000 } };
+  const events = [];
+  engine.events.on(EVENTS.BOSS_KILLED, data => events.push(data));
+
+  assert.equal(engine.combat.bosses.getBoss('goblin'), null);
+  const boss = engine.combat.bosses.getBoss('ancient_dragon');
+  assert.equal(boss.id, 'ancient_dragon');
+  assert.equal(boss.isBoss, true);
+
+  const result = engine.combat.start(player, 'ancient_dragon');
+  assert.equal(result.isBoss, true);
+  if (result.victory) {
+    assert.equal(events.length, 1);
+    assert.equal(events[0].bossId, 'ancient_dragon');
+  }
 });

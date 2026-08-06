@@ -18,8 +18,8 @@ export class ContentLoader {
       recipes: new Map(),
       npcs: new Map(),
       areas: new Map(),
-      quests: new Map(),
-      lootTables: new Map()
+      lootTables: new Map(),
+      potions: new Map()
     };
     this.itemIcons = {};
     this.emojiMap = {};
@@ -34,37 +34,44 @@ export class ContentLoader {
     }
 
     try {
-      this.itemIcons = require('../../assets/item-icons.json');
+      this.itemIcons = this._requireFresh('../../assets/item-icons.json');
     } catch {
       this.itemIcons = {};
     }
 
     try {
-      this.emojiMap = require('../../assets/emoji-map.json');
+      this.emojiMap = this._requireFresh('../../assets/emoji-map.json');
     } catch {
       this.emojiMap = {};
     }
 
-    this._loadCategory('items', require('../data/items.json'));
-    this._loadCategory('skills', require('../data/skills.json'));
-    this._loadCategory('activities', require('../data/activities.json'));
-    this._loadCategory('resources', require('../data/resources.json'));
-    this._loadCategory('enemies', require('../data/enemies.json'));
-    this._loadCategory('equipment', require('../data/equipment.json'));
-    this._loadCategory('recipes', require('../data/recipes.json'));
-    this._loadCategory('npcs', require('../data/npcs.json'));
-    this._loadCategory('areas', require('../data/areas.json'));
-    this._loadCategory('quests', require('../data/quests.json'));
-    this._loadCategory('lootTables', require('../data/lootTables.json'));
+    this._loadCategory('items', this._requireFresh('../data/items.json'));
+    this._loadCategory('skills', this._requireFresh('../data/skills.json'));
+    this._loadCategory('activities', this._requireFresh('../data/activities.json'));
+    this._loadCategory('resources', this._requireFresh('../data/resources.json'));
+    this._loadCategory('enemies', this._requireFresh('../data/enemies.json'));
+    this._loadCategory('equipment', this._requireFresh('../data/equipment.json'));
+    this._synchronizeEquipmentItems();
+    this._loadCategory('potions', this._requireFresh('../data/potions.json'));
+    this._loadCategory('recipes', this._requireFresh('../data/recipes.json'));
+    this._loadCategory('npcs', this._requireFresh('../data/npcs.json'));
+    this._loadCategory('areas', this._requireFresh('../data/areas.json'));
+    this._loadCategory('lootTables', this._requireFresh('../data/lootTables.json'));
 
     try {
-      this.heroXpTable = require('../data/heroXpTable.json');
+      this.heroXpTable = this._requireFresh('../data/heroXpTable.json');
     } catch {
       this.heroXpTable = [];
     }
 
     this.validate();
     return this;
+  }
+
+  _requireFresh(relativePath) {
+    const resolved = require.resolve(relativePath);
+    delete require.cache[resolved];
+    return require(resolved);
   }
 
   _loadCategory(category, dataArray) {
@@ -112,9 +119,61 @@ export class ContentLoader {
   }
 
   /**
+   * Equipment has item metadata (sell value, icon, category) and equipment
+   * metadata (slot, combat stats, durability). Keep the item-facing record in
+   * sync with the canonical equipment definition so displays and validation do
+   * not expose weaker or contradictory stats.
+   */
+  _synchronizeEquipmentItems() {
+    for (const equipment of this.categories.equipment.values()) {
+      const item = this.categories.items.get(equipment.id);
+      if (!item) continue;
+      this.categories.items.set(equipment.id, Object.freeze({
+        ...item,
+        requiredLevel: equipment.levelReq ?? item.requiredLevel,
+        equipmentSlot: equipment.slot,
+        statBonuses: { ...(equipment.stats || {}) }
+      }));
+    }
+  }
+
+  /**
    * Run cross-reference integrity checks across datasets.
    */
   validate() {
+    const potionTypes = new Set([
+      'health', 'strength', 'attack', 'defense', 'luck',
+      'accuracy', 'haste', 'regeneration', 'wealth', 'experience'
+    ]);
+    for (const potion of this.categories.potions.values()) {
+      if (!potionTypes.has(potion.potionType)) {
+        throw new Error(`Validation Error: Potion '${potion.id}' has invalid potionType '${potion.potionType}'.`);
+      }
+      if (typeof potion.buyPrice !== 'number' || !Number.isFinite(potion.buyPrice) || potion.buyPrice <= 0) {
+        throw new Error(`Validation Error: Potion '${potion.id}' must have a positive buyPrice.`);
+      }
+      if (potion.stackable !== true || !Number.isInteger(potion.maxStack) || potion.maxStack < 1) {
+        throw new Error(`Validation Error: Potion '${potion.id}' must be stackable with a valid maxStack.`);
+      }
+      if (!potion.effect || typeof potion.effect !== 'object') {
+        throw new Error(`Validation Error: Potion '${potion.id}' is missing an effect definition.`);
+      }
+      if (potion.potionType === 'health') {
+        const validHealthEffect = potion.effect.kind === 'full_heal'
+          || (potion.effect.kind === 'heal' && Number.isFinite(potion.effect.amount) && potion.effect.amount > 0);
+        if (!validHealthEffect) {
+          throw new Error(`Validation Error: Health potion '${potion.id}' has an invalid heal effect.`);
+        }
+      } else if (potion.effect.kind !== 'buff'
+        || typeof potion.effect.stat !== 'string'
+        || !Number.isFinite(potion.effect.amount)
+        || potion.effect.amount <= 0
+        || !Number.isFinite(potion.effect.durationMs)
+        || potion.effect.durationMs <= 0) {
+        throw new Error(`Validation Error: Potion '${potion.id}' has an invalid buff effect.`);
+      }
+    }
+
     // Validate Activity -> Skill & LootTable references
     for (const act of this.categories.activities.values()) {
       if (!this.categories.skills.has(act.skillId)) {
@@ -144,11 +203,45 @@ export class ContentLoader {
       }
     }
 
+    // Equipment definitions are the canonical source for slots, stats, and
+    // durability, but every equippable item must still have sell/display
+    // metadata in the universal item catalogue.
+    for (const equipment of this.categories.equipment.values()) {
+      if (!this.categories.items.has(equipment.id)) {
+        throw new Error(`Validation Error: Equipment '${equipment.id}' is missing from items.`);
+      }
+    }
+
     // Validate LootTable -> Item references
     for (const lt of this.categories.lootTables.values()) {
       for (const entry of lt.entries) {
         if (!this.categories.items.has(entry.itemId)) {
           throw new Error(`Validation Error: LootTable '${lt.id}' references missing itemId '${entry.itemId}'.`);
+        }
+      }
+    }
+
+    // Validate world references so travel, gathering, combat, and NPC flows
+    // cannot advertise IDs that will fail at runtime.
+    for (const resource of this.categories.resources.values()) {
+      if (!this.categories.items.has(resource.resourceItemId)) {
+        throw new Error(`Validation Error: Resource '${resource.id}' references missing resourceItemId '${resource.resourceItemId}'.`);
+      }
+    }
+    for (const area of this.categories.areas.values()) {
+      for (const resourceId of area.resourceIds || []) {
+        if (!this.categories.resources.has(resourceId)) {
+          throw new Error(`Validation Error: Area '${area.id}' references missing resourceId '${resourceId}'.`);
+        }
+      }
+      for (const enemyId of area.enemyIds || []) {
+        if (!this.categories.enemies.has(enemyId)) {
+          throw new Error(`Validation Error: Area '${area.id}' references missing enemyId '${enemyId}'.`);
+        }
+      }
+      for (const npcId of area.npcIds || []) {
+        if (!this.categories.npcs.has(npcId)) {
+          throw new Error(`Validation Error: Area '${area.id}' references missing npcId '${npcId}'.`);
         }
       }
     }
@@ -196,11 +289,11 @@ export class ContentLoader {
     const normalized = rawClean.toLowerCase().replace(/[\s\-_]+/g, '_');
 
     // 1. Direct match on normalized ID
-    if (this.getItem(normalized)) {
+    if (this.getItem(normalized) || this.getPotion(normalized)) {
       return normalized;
     }
 
-    const allItems = this.getAll('items');
+    const allItems = [...this.getAll('items'), ...this.getAll('potions')];
 
     // 2. Direct match on item.id
     for (const item of allItems) {
@@ -238,6 +331,7 @@ export class ContentLoader {
   }
 
   getItem(id) { return this.categories.items.get(id) || null; }
+  getPotion(id) { return this.categories.potions.get(id) || null; }
   getSkill(id) { return this.categories.skills.get(id) || null; }
   getActivity(id) { return this.categories.activities.get(id) || null; }
   getResource(id) { return this.categories.resources.get(id) || null; }
@@ -246,8 +340,8 @@ export class ContentLoader {
   getRecipe(id) { return this.categories.recipes.get(id) || null; }
   getNpc(id) { return this.categories.npcs.get(id) || null; }
   getArea(id) { return this.categories.areas.get(id) || null; }
-  getQuest(id) { return this.categories.quests.get(id) || null; }
   getLootTable(id) { return this.categories.lootTables.get(id) || null; }
+  getAllPotions() { return this.getAll('potions'); }
   getHeroXpTable() { return this.heroXpTable || []; }
 
   getAll(category) {

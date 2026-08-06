@@ -42,8 +42,37 @@ test('Combat sub-modules damage and enemies', async () => {
   const enemy = engine.combat.enemies.getEnemy('goblin');
 
   assert.equal(enemy.id, 'goblin');
-  assert.equal(enemy.name, 'Goblin');
+  assert.equal(enemy.name, 'Goblin Scavenger');
 
   const combatRes = engine.combat.attack(player, 'goblin');
   assert.equal(combatRes.attackerId, 'usr_400');
+});
+
+test('Rewards module ignores malformed item and currency grants', async () => {
+  const engine = await createEngine();
+  const player = engine.player.create('usr_rewards_guard', 'Reward Guard');
+  const result = engine.rewards.grantLoot(player, [
+    { id: 'copper_ore', amount: 0 },
+    { id: 'coal', amount: 2 },
+    { id: 'lead_ore', amount: -1 },
+    null
+  ], { gold: 5, sterlings: NaN, gems: -2 }, engine.inventory, engine.economy);
+
+  assert.deepEqual(result.grantedItems, [{ id: 'coal', amount: 2 }]);
+  assert.deepEqual(result.grantedCurrencies, { gold: 5 });
+  assert.equal(player.inventory.coal, 2);
+  assert.equal(player.inventory.copper_ore, undefined);
+  assert.equal(player.currencies.gold, 5);
+  assert.equal(player.currencies.gems, undefined);
+});
+
+test('Rewards module does not report rejected currency overflow as granted', async () => {
+  const engine = await createEngine();
+  const player = engine.player.create('usr_rewards_overflow', 'Reward Guard');
+  player.currencies.gold = Number.MAX_SAFE_INTEGER - 1;
+
+  const result = engine.rewards.grantLoot(player, [], { gold: 2 }, engine.inventory, engine.economy);
+
+  assert.deepEqual(result.grantedCurrencies, {});
+  assert.equal(player.currencies.gold, Number.MAX_SAFE_INTEGER - 1);
 });

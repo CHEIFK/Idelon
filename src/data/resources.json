@@ -14,7 +14,7 @@
   { "id": "adamant_node", "name": "Adamant Monolith", "resourceItemId": "adamant_ore", "miningLevel": 10, "respawnMs": 15000 },
   { "id": "runic_node", "name": "Runic Crystal", "resourceItemId": "runic_ore", "miningLevel": 10, "respawnMs": 20000 },
 
-  { "id": "oak_tree", "name": "Oak Tree", "resourceItemId": "oak_log", "respawnMs": 4000 },
+  { "id": "oak_tree", "name": "Oak Tree", "resourceItemId": "wood_log", "respawnMs": 4000 },
   { "id": "birch_tree", "name": "Birch Grove", "resourceItemId": "birch_log", "respawnMs": 4500 },
   { "id": "willow_tree", "name": "Willow Tree", "resourceItemId": "willow_log", "respawnMs": 5500 },
   { "id": "maple_tree", "name": "Maple Tree", "resourceItemId": "maple_log", "respawnMs": 7000 },

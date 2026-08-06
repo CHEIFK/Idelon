@@ -5,7 +5,7 @@ export default {
   name: 'travel',
   category: 'world',
   description: 'Travel to an unlocked world sector.',
-  options: [{ name: 'sector', type: 'STRING', required: true }],
+  options: [{ name: 'sector', description: 'Unlocked sector name or number to visit', type: 'STRING', required: true }],
   async execute(interaction, gameService) {
     try {
       const input = interaction.options?.getString('sector');

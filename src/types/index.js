@@ -7,7 +7,6 @@
  * @property {Record<string, number>} inventory
  * @property {Record<string, {xp: number, level: number}>} skills
  * @property {Record<string, any>} equipment
- * @property {Record<string, any>} quests
  * @property {ActivityState | null} currentActivity
  */
 

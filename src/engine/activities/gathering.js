@@ -1,4 +1,4 @@
-import { EVENTS } from '../../constants/index.js';
+import { EVENTS, getActivitySpeedMultiplier, MAX_OFFLINE_MINING_DURATION_MS } from '../../constants/index.js';
 import { getGatheringQuantityMultiplier } from '../../utils/sectorMap.js';
 
 /**
@@ -26,10 +26,21 @@ export class GatheringActivity {
       throw new Error(`Activity '${activityId}' not found in content loader.`);
     }
 
-    if (activityDef.skillId !== 'mining') {
-      const playerLevel = player.skills[activityDef.skillId]?.level || 1;
-      if (playerLevel < activityDef.levelReq) {
-        return null;
+    // Skill levels continue to gate resource activities. Sector access is
+    // validated separately through the Hero-Level world progression helpers.
+    const playerLevel = player.skills[activityDef.skillId]?.level || 1;
+    if (playerLevel < activityDef.levelReq) {
+      return null;
+    }
+
+    if (player.currentActivity) {
+      if (player.currentActivity.id === activityId || player.currentActivity.skillId === activityDef.skillId) {
+        return {
+          alreadyActive: true,
+          reason: 'already_active',
+          skillId: activityDef.skillId,
+          currentActivity: player.currentActivity
+        };
       }
     }
 
@@ -70,14 +81,22 @@ export class GatheringActivity {
     const activityDef = contentLoader.getActivity(player.currentActivity.id);
     if (!activityDef) return null;
 
+    const speedMult = getActivitySpeedMultiplier(
+      player.currentActivity,
+      player,
+      this.engine?.potions
+    );
+    const effectiveDuration = activityDef.durationMs / speedMult;
+
     const now = Date.now();
-    const elapsedMs = now - player.currentActivity.lastClaimed;
-    const cycles = Math.floor(elapsedMs / activityDef.durationMs);
+    const rawElapsedMs = Math.max(0, now - player.currentActivity.lastClaimed);
+    const elapsedMs = Math.min(rawElapsedMs, MAX_OFFLINE_MINING_DURATION_MS);
+    const cycles = Math.floor(elapsedMs / effectiveDuration);
 
     if (cycles <= 0) {
       return {
         cyclesCompleted: 0,
-        elapsedMs,
+        elapsedMs: rawElapsedMs,
         itemsGained: [],
         xpGained: 0,
         currenciesGained: {}
@@ -91,9 +110,13 @@ export class GatheringActivity {
     if (lootTable && Array.isArray(lootTable.entries)) {
       for (let i = 0; i < cycles; i++) {
         for (const entry of lootTable.entries) {
-          if (Math.random() <= entry.chance) {
-            const min = entry.min || 1;
-            const max = entry.max || 1;
+            const luckPercent = this.engine?.potions?.getModifier
+              ? this.engine.potions.getModifier(player, 'luck')
+              : 0;
+            const chance = Math.min(1, Math.max(0, (entry.chance || 0) + luckPercent / 100));
+            if (Math.random() <= chance) {
+            const min = entry.min ?? entry.amount ?? 1;
+            const max = entry.max ?? entry.amount ?? 1;
             const qty = Math.floor(Math.random() * (max - min + 1)) + min;
             itemTotals.set(entry.itemId, (itemTotals.get(entry.itemId) || 0) + qty);
           }
@@ -132,8 +155,9 @@ export class GatheringActivity {
     }
 
     // 4. Award Skill XP & emit events
-    const xpGained = (activityDef.xpPerCycle || 10) * cycles;
-    const xpResult = skillsModule ? skillsModule.addXP(player, activityDef.skillId, xpGained) : { xp: xpGained, level: 1, leveledUp: false };
+    const baseXpGained = (activityDef.xpPerCycle || 10) * cycles;
+    const xpResult = skillsModule ? skillsModule.addXP(player, activityDef.skillId, baseXpGained) : { xp: baseXpGained, xpGained: baseXpGained, level: 1, leveledUp: false };
+    const xpGained = xpResult.xpGained ?? baseXpGained;
 
     if (eventsBus) {
       eventsBus.emit(EVENTS.XP_GAINED, {
@@ -160,8 +184,12 @@ export class GatheringActivity {
       });
     }
 
-    // Update lastClaimed timestamp forward by claimed cycles
-    player.currentActivity.lastClaimed += cycles * activityDef.durationMs;
+    // Update lastClaimed timestamp
+    if (rawElapsedMs >= MAX_OFFLINE_MINING_DURATION_MS) {
+      player.currentActivity.lastClaimed = now;
+    } else {
+      player.currentActivity.lastClaimed += Math.floor(cycles * effectiveDuration);
+    }
 
     return {
       cyclesCompleted: cycles,

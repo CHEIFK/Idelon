@@ -1,16 +1,15 @@
-import { createProfileEmbed, createErrorEmbed } from '../../embeds.js';
+import { createWelcomeEmbed, createErrorEmbed } from '../../embeds.js';
 
 export default {
   name: 'start',
   category: 'player',
-  description: 'Start your journey or log into your player account.',
+  description: 'Start your journey with a quick guide to Idelon.',
   async execute(interaction, gameService) {
     try {
       const playerId = interaction.user.id;
       const username = interaction.user.username;
-      const res = await gameService.start(playerId, username);
-      const profile = await gameService.getProfile(playerId);
-      return { embed: createProfileEmbed(profile) };
+      await gameService.start(playerId, username);
+      return { embed: createWelcomeEmbed() };
     } catch (err) {
       return { embed: createErrorEmbed('Start Error', err.message) };
     }
